@@ -10,7 +10,7 @@ import { SendVerifyEmailDTO } from './dto/sendverifyEmail.dto';
 import { EmailService } from '../core/services';
 import { ChangePasswordDTO, vChangePasswordDTO } from './dto/changePassword.dto';
 import { JoiValidatorPipe } from '../core/pipe/validator.pipe';
-import { UpdateNameDTO, vUpdateNameDTO } from './dto/updateName.dto';
+import { UpdateUserDTO, vUpdateUserDTO } from './dto/updateName.dto';
 import { JwtToken } from '../core/interface';
 
 @ApiTags('user')
@@ -86,15 +86,14 @@ export class UserController {
         return res.send({ message: 'success' });
     }
 
-    @Put('/name')
+    @Put('/')
     @UseGuards(AuthGuard)
-    @UsePipes(new JoiValidatorPipe(vUpdateNameDTO))
-    async updateUserInformation(@Body() body: UpdateNameDTO, @Res() res: Response, @Req() req: Request) {
+    @UsePipes(new JoiValidatorPipe(vUpdateUserDTO))
+    async updateUserInformation(@Body() body: UpdateUserDTO, @Res() res: Response, @Req() req: Request) {
         //get current user data
-        const userId = req.user.id;
-        const user = await this.userService.findUser('id', userId);
+        const user = await this.userService.findUser('id', req.user.id);
         // update field
-        user.name = body.value;
+        user.name = body.name;
         await this.userService.saveUser(user);
         return res.send({ message: 'success' });
     }
