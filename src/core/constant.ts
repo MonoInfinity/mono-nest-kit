@@ -3,6 +3,7 @@ export const constant = Object.freeze({
         loginCookieTime: 1000 * 60 * 60 * 24 * 30,
         registerCookieTime: 1000 * 60 * 60 * 24 * 30,
         googleUserCookieTime: 1000 * 60 * 60 * 24 * 30,
+        facebookUserCookieTime: 1000 * 60 * 60 * 24 * 30,
     },
     default: {
         currentPage: 0,

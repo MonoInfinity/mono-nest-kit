@@ -4,6 +4,7 @@ import { AuthController } from './auth.controller';
 import { JwtService } from '@nestjs/jwt';
 import { UserModule } from '../user/user.module';
 import { GoogleStrategy } from './passport/google.strategy';
+import { FacebookStrategy } from './passport/facebook.strategy';
 
 @Module({
     imports: [forwardRef(() => UserModule)],
@@ -11,6 +12,7 @@ import { GoogleStrategy } from './passport/google.strategy';
     providers: [
         AuthService,
         GoogleStrategy,
+        FacebookStrategy,
         {
             provide: JwtService,
             useFactory: () => {
