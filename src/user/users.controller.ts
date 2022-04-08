@@ -1,3 +1,5 @@
+import { User } from './../core/models';
+import { SortOrder } from './../core/interface';
 import { QueryJoiValidatorPipe } from './../core/pipe/queryValidator.pipe';
 import { FilterUsersDTO, vFilterUsersDto } from './dto/filterUsers.dto';
 import { Controller, Get, Query, Res, UsePipes } from '@nestjs/common';
@@ -15,10 +17,16 @@ export class UsersController {
     @Get('/search')
     @UsePipes(new QueryJoiValidatorPipe(vFilterUsersDto))
     async filterUsers(@Query() queries: FilterUsersDTO, @Res() res: Response) {
-        const { name, currentPage, pageSize } = queries;
+        const { name, currentPage, pageSize, orderBy, order } = queries;
 
         // filter user
-        const users = await this.userService.filterUsers(name, currentPage, pageSize);
-        return res.send(users);
+        let users: User[];
+        try {
+            users = await this.userService.filterUsers(name, currentPage, pageSize, orderBy, order as SortOrder);
+        } catch {
+            return res.send({ users: [], count: 0 });
+        }
+        const count = await this.userService.getAllUsersCount(name);
+        return res.send({ users, count });
     }
 }

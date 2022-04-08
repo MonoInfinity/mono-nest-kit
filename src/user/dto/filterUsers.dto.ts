@@ -2,7 +2,7 @@ import { constant } from './../../core/constant';
 import { ApiProperty } from '@nestjs/swagger';
 import * as joi from 'joi';
 
-const { currentPage, pageSize } = constant.default;
+const { currentPage, pageSize, orderBy } = constant.default;
 
 export class FilterUsersDTO {
     @ApiProperty({ description: 'Name', example: 'ha', nullable: true })
@@ -13,10 +13,18 @@ export class FilterUsersDTO {
 
     @ApiProperty({ description: 'Page size', example: 4, nullable: true })
     pageSize: number;
+
+    @ApiProperty({ description: 'Order by', example: 'name', nullable: true })
+    orderBy: string;
+
+    @ApiProperty({ description: 'Order', example: 'asc', nullable: true })
+    order: string;
 }
 
 export const vFilterUsersDto = joi.object({
     currentPage: joi.number().failover(currentPage).min(0).required(),
     name: joi.string().allow('').failover('').required(),
     pageSize: joi.number().failover(pageSize).min(0).required(),
+    orderBy: joi.string().allow('').failover(orderBy).required(),
+    order: joi.string().allow('').failover('ASC').valid('ASC', 'DESC').required(),
 });
