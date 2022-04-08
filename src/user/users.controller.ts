@@ -26,7 +26,7 @@ export class UsersController {
         } catch {
             return res.send({ users: [], count: 0 });
         }
-        const count = await this.userService.getAllUsersCount(name);
+        const count = await this.userService.countAllUsers(name);
         return res.send({ users, count });
     }
 }

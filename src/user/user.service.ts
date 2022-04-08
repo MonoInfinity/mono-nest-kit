@@ -31,7 +31,7 @@ export class UserService {
             .getMany();
     }
 
-    async getAllUsersCount(name: string): Promise<number> {
+    async countAllUsers(name: string): Promise<number> {
         return await this.userRepository
             .createQueryBuilder('user')
             .where(`user.name LIKE (:name)`, {
