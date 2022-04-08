@@ -7,6 +7,7 @@ import { initTestModule } from '../../core/test/initTest';
 import * as supertest from 'supertest';
 import { ChangePasswordDTO } from '../dto/changePassword.dto';
 import { StatusCodes } from 'http-status-codes';
+import { User } from 'src/core/models';
 
 describe('UserController', () => {
     let app: INestApplication;
@@ -60,6 +61,28 @@ describe('UserController', () => {
                 changePasswordData.currentPassword = fakeData(9, 'letters');
                 const res = await reqApi(changePasswordData, token);
                 expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+            });
+        });
+    });
+
+    describe('Get User', () => {
+        describe('Get /me', () => {
+            let getUser: User;
+            const reqApi = (token: string) =>
+                supertest(app.getHttpServer())
+                    .get('/api/user/me')
+                    .set({ authorization: `Bearer ${token}` });
+            let token;
+            beforeEach(async () => {
+                getUser = fakeUser();
+                await userService.saveUser(getUser);
+                token = await authService.createAccessToken(getUser);
+            });
+
+            it('Pass', async () => {
+                const res = await reqApi(token);
+                expect(res.body).toBeDefined();
+                expect(res.body.username).toBe(getUser.username);
             });
         });
     });
