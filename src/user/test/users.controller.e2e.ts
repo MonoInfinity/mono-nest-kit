@@ -27,15 +27,24 @@ describe('UsersController', () => {
             });
 
             it('Pass (valid queries)', async () => {
-                const reqApi = () => supertest(app.getHttpServer()).get('/api/users/search').query({ name: 'a', currentPage: 1, pageSize: 3 });
+                const reqApi = () =>
+                    supertest(app.getHttpServer())
+                        .get('/api/users/search')
+                        .query({ name: 'a', currentPage: 1, pageSize: 3, orderBy: 'id', order: 'ASC' });
                 const res = await reqApi();
-                expect(res.body.length).not.toBe(0);
+                expect(res.body.count).not.toBe(0);
             });
 
-            it('Pass (invalid queries)', async () => {
+            it('Pass (invalid page & current page)', async () => {
                 const reqApi = () => supertest(app.getHttpServer()).get('/api/users/search').query({ name: '', currentPage: -1, pageSize: -3 });
                 const res = await reqApi();
-                expect(res.body.length).not.toBe(0);
+                expect(res.body.count).not.toBe(0);
+            });
+
+            it('Pass (invalid orderBy)', async () => {
+                const reqApi = () => supertest(app.getHttpServer()).get('/api/users/search').query({ name: '', orderBy: 'aaaa' });
+                const res = await reqApi();
+                expect(res.body.count).toBe(0);
             });
         });
     });

@@ -5,6 +5,7 @@ export const constant = Object.freeze({
         googleUserCookieTime: 1000 * 60 * 60 * 24 * 30,
     },
     default: {
+        orderBy: 'createDate',
         currentPage: 0,
         pageSize: 12,
         pageSizeMd: 24,

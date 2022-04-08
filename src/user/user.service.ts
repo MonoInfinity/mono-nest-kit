@@ -1,3 +1,4 @@
+import { SortOrder } from './../core/interface';
 import { Injectable } from '@nestjs/common';
 import { User } from '../core/models';
 import { UserRepository } from '../core/repositories';
@@ -18,18 +19,24 @@ export class UserService {
         return await this.userRepository.findManyByField(field, value);
     }
 
-    async getAll(): Promise<User[]> {
-        return await this.userRepository.find();
-    }
-
-    async filterUsers(name: string, currentPage: number, pageSize: number): Promise<User[]> {
+    async filterUsers(name: string, currentPage: number, pageSize: number, orderBy: string, order: SortOrder): Promise<User[]> {
         return await this.userRepository
             .createQueryBuilder('user')
             .where(`user.name LIKE (:name)`, {
                 name: `%${name}%`,
             })
+            .orderBy(`user.${orderBy}`, order)
             .skip(currentPage * pageSize)
             .take(pageSize)
             .getMany();
+    }
+
+    async countAllUsers(name: string): Promise<number> {
+        return await this.userRepository
+            .createQueryBuilder('user')
+            .where(`user.name LIKE (:name)`, {
+                name: `%${name}%`,
+            })
+            .getCount();
     }
 }
