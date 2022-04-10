@@ -83,7 +83,7 @@ export class UserController {
         return res.send('ok');
     }
 
-    @Put('/name')
+    @Put('/')
     @UseGuards(AuthGuard)
     @UsePipes(new JoiValidatorPipe(vUpdateUserDTO))
     async updateUserInformation(@Body() body: UpdateUserDTO, @Res() res: Response, @Req() req: Request) {
