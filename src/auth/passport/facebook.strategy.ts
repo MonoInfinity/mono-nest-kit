@@ -3,18 +3,19 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-facebook';
 
 // ----- Service
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../../user/user.service';
 
 // ----- Entity
-import { User } from 'src/core/models';
+import { User } from '../../core/models';
+import { config } from '../../core';
 
 @Injectable()
 export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
     constructor(private readonly userService: UserService) {
         super({
-            clientID: process.env.FACEBOOK_CLIENT_ID,
-            clientSecret: process.env.FACEBOOK_SECRET,
-            callbackURL: `${process.env.SERVER_URL}/auth/facebook/callback`,
+            clientID: config.FACEBOOK_CLIENT_ID,
+            clientSecret: config.FACEBOOK_SECRET,
+            callbackURL: `${config.SERVER_URL}/auth/facebook/callback`,
             profileFields: ['id', 'name', 'displayName', 'photos'],
         });
     }

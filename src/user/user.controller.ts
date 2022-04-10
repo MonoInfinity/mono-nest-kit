@@ -1,17 +1,14 @@
 import { Body, Controller, Get, HttpException, Param, Post, Put, Req, Res, UseGuards, UsePipes } from '@nestjs/common';
-
 import { UserService } from './user.service';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { AuthGuard } from '../auth/auth.guard';
 import { AuthService } from '../auth/auth.service';
-import { SendVerifyEmailDTO } from './dto/sendverifyEmail.dto';
 import { EmailService } from '../core/services';
-import { ChangePasswordDTO, vChangePasswordDTO } from './dto/changePassword.dto';
 import { JoiValidatorPipe } from '../core/pipe/validator.pipe';
-import { UpdateNameDTO, vUpdateNameDTO } from './dto/updateName.dto';
 import { JwtToken } from '../core/interface';
+import { RequestVerifyEmailDTO, ChangePasswordDTO, vChangePasswordDTO, UpdateUserDTO, vUpdateUserDTO } from './dto';
 
 @ApiTags('user')
 @ApiBearerAuth()
@@ -20,7 +17,7 @@ export class UserController {
     constructor(private readonly userService: UserService, private readonly authService: AuthService, private readonly emailService: EmailService) {}
 
     @Post('/send-verify-email')
-    async cSendVerifyEmail(@Body() body: SendVerifyEmailDTO, @Res() res: Response) {
+    async cSendVerifyEmail(@Body() body: RequestVerifyEmailDTO, @Res() res: Response) {
         const user = await this.userService.findUser('email', body.email);
 
         if (!user) {
@@ -35,7 +32,7 @@ export class UserController {
             throw new HttpException({ errorMessage: 'error.something_wrong' }, StatusCodes.INTERNAL_SERVER_ERROR);
         }
 
-        return res.send({ message: 'success' });
+        return res.send('ok');
     }
 
     @Get('/verify/:otp')
@@ -53,7 +50,7 @@ export class UserController {
         user.isVerified = true;
         await this.userService.saveUser(user);
 
-        return res.send({});
+        return res.send('ok');
     }
 
     @Get('/me')
@@ -66,7 +63,7 @@ export class UserController {
     async cGetOneById(@Param('userId') userId: string, @Res() res: Response) {
         const user = await this.userService.findUser('id', userId);
         if (!user) throw new HttpException({ errorMessage: 'error.not_found' }, StatusCodes.NOT_FOUND);
-        return res.send({ data: user });
+        return res.send(user);
     }
 
     @Put('/password')
@@ -83,19 +80,19 @@ export class UserController {
         //change password to new password
         user.password = await this.authService.encryptPassword(body.newPassword, 10);
         await this.userService.saveUser(user);
-        return res.send({ message: 'success' });
+        return res.send('ok');
     }
 
     @Put('/name')
     @UseGuards(AuthGuard)
-    @UsePipes(new JoiValidatorPipe(vUpdateNameDTO))
-    async updateUserInformation(@Body() body: UpdateNameDTO, @Res() res: Response, @Req() req: Request) {
+    @UsePipes(new JoiValidatorPipe(vUpdateUserDTO))
+    async updateUserInformation(@Body() body: UpdateUserDTO, @Res() res: Response, @Req() req: Request) {
         //get current user data
         const userId = req.user.id;
         const user = await this.userService.findUser('id', userId);
         // update field
-        user.name = body.value;
+        user.name = body.name;
         await this.userService.saveUser(user);
-        return res.send({ message: 'success' });
+        return res.send('ok');
     }
 }

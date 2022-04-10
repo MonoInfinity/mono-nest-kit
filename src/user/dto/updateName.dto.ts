@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import * as joi from 'joi';
 import { userValidateSchema } from '../../core/models';
-export class UpdateNameDTO {
+export class UpdateUserDTO {
     @ApiProperty({ description: 'Name', example: 'Duc Dauuu' })
-    value: string;
+    name: string;
 }
 
-export const vUpdateNameDTO = joi.object<UpdateNameDTO>({
-    value: userValidateSchema.name,
+export const vUpdateUserDTO = joi.object<UpdateUserDTO>({
+    name: userValidateSchema.name,
 });

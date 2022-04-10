@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserModule } from '../user/user.module';
 import { GoogleStrategy } from './passport/google.strategy';
 import { FacebookStrategy } from './passport/facebook.strategy';
+import { config } from '../core';
 
 @Module({
     imports: [forwardRef(() => UserModule)],
@@ -16,7 +17,7 @@ import { FacebookStrategy } from './passport/facebook.strategy';
         {
             provide: JwtService,
             useFactory: () => {
-                return new JwtService({ secret: process.env.JWT_SECRET });
+                return new JwtService({ secret: config.JWT_SECRET_KEY });
             },
         },
     ],

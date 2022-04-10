@@ -19,24 +19,28 @@ export class UserService {
         return await this.userRepository.findManyByField(field, value);
     }
 
-    async filterUsers(name: string, currentPage: number, pageSize: number, orderBy: string, order: SortOrder): Promise<User[]> {
-        return await this.userRepository
-            .createQueryBuilder('user')
-            .where(`user.name LIKE (:name)`, {
-                name: `%${name}%`,
-            })
-            .orderBy(`user.${orderBy}`, order)
-            .skip(currentPage * pageSize)
-            .take(pageSize)
-            .getMany();
-    }
+    async filterUsers(name: string, currentPage: number, pageSize: number, orderBy: string, order: SortOrder): Promise<{ data: User[]; count: number }> {
+        try {
+            const users = await this.userRepository
+                .createQueryBuilder('user')
+                .where(`user.name LIKE (:name)`, {
+                    name: `%${name}%`,
+                })
+                .orderBy(`user.${orderBy}`, order)
+                .skip(currentPage * pageSize)
+                .take(pageSize)
+                .getMany();
 
-    async countAllUsers(name: string): Promise<number> {
-        return await this.userRepository
-            .createQueryBuilder('user')
-            .where(`user.name LIKE (:name)`, {
-                name: `%${name}%`,
-            })
-            .getCount();
+            const count = await this.userRepository
+                .createQueryBuilder('user')
+                .where(`user.name LIKE (:name)`, {
+                    name: `%${name}%`,
+                })
+                .getCount();
+
+            return { data: users, count };
+        } catch (err) {
+            return { data: [], count: 0 };
+        }
     }
 }
