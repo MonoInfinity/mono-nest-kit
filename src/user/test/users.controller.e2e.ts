@@ -1,4 +1,4 @@
-import { fakeUser } from './../../core/test/helper';
+import { fakeData, fakeUser } from './../../core/test/helper';
 import { INestApplication } from '@nestjs/common';
 import { UserRepository } from '../../core/repositories';
 import { UserService } from '../../user/user.service';
@@ -22,15 +22,15 @@ describe('UsersController', () => {
     describe('Get Users', () => {
         describe('GET /search', () => {
             beforeEach(async () => {
-                const getUser = fakeUser();
-                await userService.saveUser(getUser);
+                for (let i = 0; i < 6; i++) {
+                    const getUser = fakeUser();
+                    getUser.username = fakeData(10, 'letters');
+                    await userService.saveUser(getUser);
+                }
             });
 
             it('Pass (valid queries)', async () => {
-                const reqApi = () =>
-                    supertest(app.getHttpServer())
-                        .get('/api/users/search')
-                        .query({ name: 'a', currentPage: 1, pageSize: 3, orderBy: 'id', order: 'ASC' });
+                const reqApi = () => supertest(app.getHttpServer()).get('/api/users/search').query({ name: 'a', currentPage: 1, pageSize: 3, orderBy: 'id', order: 'ASC' });
                 const res = await reqApi();
                 expect(res.body.count).not.toBe(0);
             });
