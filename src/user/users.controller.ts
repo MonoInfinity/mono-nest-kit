@@ -1,4 +1,3 @@
-import { SortOrder } from './../core/interface';
 import { QueryJoiValidatorPipe } from './../core/pipe/queryValidator.pipe';
 import { FilterUsersDTO, vFilterUsersDto } from './dto/filterUsers.dto';
 import { Controller, Get, Query, Res, UsePipes } from '@nestjs/common';
@@ -17,7 +16,7 @@ export class UsersController {
     async filterUsers(@Query() queries: FilterUsersDTO, @Res() res: Response) {
         const { name, currentPage, pageSize, orderBy, order } = queries;
 
-        const result = await this.userService.filterUsers(name, currentPage, pageSize, orderBy, order as SortOrder);
+        const result = await this.userService.filterUsers(name, currentPage, pageSize, orderBy, order);
 
         return res.send(result);
     }

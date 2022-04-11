@@ -75,8 +75,12 @@ describe('AuthController', () => {
             });
             it('Pass', async () => {
                 const res = await reqApi(registerData);
+                const user = await userRepository.findOneByField('username', getUser.username);
+
+                expect(user.name).toBe(getUser.name);
                 expect(res.body.token).not.toBeNull();
             });
+
             it('Failed (username taken)', async () => {
                 await userService.saveUser(getUser);
                 const res = await reqApi(registerData);

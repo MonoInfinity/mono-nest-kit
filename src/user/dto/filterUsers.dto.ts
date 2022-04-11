@@ -1,6 +1,7 @@
 import { constant } from './../../core/constant';
 import { ApiProperty } from '@nestjs/swagger';
 import * as joi from 'joi';
+import { SortOrder } from '../../core/interface';
 
 const { currentPage, pageSize, orderBy } = constant.default;
 
@@ -18,7 +19,7 @@ export class FilterUsersDTO {
     orderBy: string;
 
     @ApiProperty({ description: 'Order', example: 'asc', nullable: true })
-    order: string;
+    order: SortOrder;
 }
 
 export const vFilterUsersDto = joi.object({
@@ -26,5 +27,5 @@ export const vFilterUsersDto = joi.object({
     name: joi.string().allow('').failover('').required(),
     pageSize: joi.number().failover(pageSize).min(0).required(),
     orderBy: joi.string().allow('').failover(orderBy).required(),
-    order: joi.string().allow('').failover('ASC').valid('ASC', 'DESC').required(),
+    order: joi.string().allow('').failover(SortOrder.ASC).valid(SortOrder.ASC, SortOrder.DESC).required(),
 });

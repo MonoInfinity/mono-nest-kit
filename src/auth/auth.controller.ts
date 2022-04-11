@@ -27,7 +27,7 @@ export class AuthController {
         const newUser = new User();
         newUser.name = body.name;
         newUser.username = body.username;
-        newUser.password = await this.authService.encryptPassword(body.password, 10);
+        newUser.password = await this.authService.encryptPassword(body.password, constant.default.hashingSalt);
 
         const insertedUser = await this.userService.saveUser(newUser);
 

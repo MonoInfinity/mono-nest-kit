@@ -8,7 +8,8 @@ import { AuthService } from '../auth/auth.service';
 import { EmailService } from '../core/services';
 import { JoiValidatorPipe } from '../core/pipe/validator.pipe';
 import { JwtToken } from '../core/interface';
-import { RequestVerifyEmailDTO, ChangePasswordDTO, vChangePasswordDTO, UpdateUserDTO, vUpdateUserDTO } from './dto';
+import { RequestVerifyEmailDTO, ChangePasswordDTO, vChangePasswordDTO, UpdateUserDTO, vUpdateUserDTO, vRequestVerifyEmailDTO } from './dto';
+import { constant } from '../core';
 
 @ApiTags('user')
 @ApiBearerAuth()
@@ -17,6 +18,7 @@ export class UserController {
     constructor(private readonly userService: UserService, private readonly authService: AuthService, private readonly emailService: EmailService) {}
 
     @Post('/send-verify-email')
+    @UsePipes(new JoiValidatorPipe(vRequestVerifyEmailDTO))
     async cSendVerifyEmail(@Body() body: RequestVerifyEmailDTO, @Res() res: Response) {
         const user = await this.userService.findUser('email', body.email);
 
@@ -32,7 +34,7 @@ export class UserController {
             throw new HttpException({ errorMessage: 'error.something_wrong' }, StatusCodes.INTERNAL_SERVER_ERROR);
         }
 
-        return res.send('ok');
+        return res.send();
     }
 
     @Get('/verify/:otp')
@@ -50,7 +52,7 @@ export class UserController {
         user.isVerified = true;
         await this.userService.saveUser(user);
 
-        return res.send('ok');
+        return res.send();
     }
 
     @Get('/me')
@@ -78,9 +80,9 @@ export class UserController {
             throw new HttpException({ errorMessage: 'error.invalid_current_password' }, StatusCodes.BAD_REQUEST);
         }
         //change password to new password
-        user.password = await this.authService.encryptPassword(body.newPassword, 10);
+        user.password = await this.authService.encryptPassword(body.newPassword, constant.default.hashingSalt);
         await this.userService.saveUser(user);
-        return res.send('ok');
+        return res.send();
     }
 
     @Put('/')
@@ -93,6 +95,6 @@ export class UserController {
         // update field
         user.name = body.name;
         await this.userService.saveUser(user);
-        return res.send('ok');
+        return res.send();
     }
 }

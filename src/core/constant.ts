@@ -11,5 +11,6 @@ export const constant = Object.freeze({
         pageSize: 12,
         pageSizeMd: 24,
         pageSizeLg: 48,
+        hashingSalt: 8,
     },
 });
