@@ -90,8 +90,7 @@ export class UserController {
     @UsePipes(new JoiValidatorPipe(vUpdateUserDTO))
     async updateUserInformation(@Body() body: UpdateUserDTO, @Res() res: Response, @Req() req: Request) {
         //get current user data
-        const userId = req.user.id;
-        const user = await this.userService.findUser('id', userId);
+        const user = await this.userService.findUser('id', req.user.id);
         // update field
         user.name = body.name;
         await this.userService.saveUser(user);

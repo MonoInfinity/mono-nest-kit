@@ -28,6 +28,29 @@ describe('UserController', () => {
     });
 
     describe('Put User', () => {
+        describe('PUT /', () => {
+            let updateUser: UpdateUserDTO;
+            let token;
+            const reqApi = (input: UpdateUserDTO, token: string) =>
+                supertest(app.getHttpServer())
+                    .put('/api/user')
+                    .set({ authorization: `Bearer ${token}` })
+                    .send(input);
+            beforeEach(async () => {
+                const getUser = fakeUser();
+                updateUser = {
+                    name: fakeData(10, 'lettersAndNumbersLowerCase'),
+                };
+                await userService.saveUser(getUser);
+                token = await authService.createAccessToken(getUser);
+            });
+
+            it('Pass', async () => {
+                const res = await reqApi(updateUser, token);
+                expect(res.status).toBe(StatusCodes.OK);
+            });
+        });
+
         describe('PUT /password', () => {
             let changePasswordData: ChangePasswordDTO;
             const reqApi = (input: ChangePasswordDTO, token: string) =>
@@ -53,12 +76,12 @@ describe('UserController', () => {
                 expect(res.status).toBe(StatusCodes.OK);
             });
 
-            it('Fail (Invalid token)', async () => {
+            it('Failed (Invalid token)', async () => {
                 const res = await reqApi(changePasswordData, '');
                 expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
             });
 
-            it('Fail (Invalid currentPassword)', async () => {
+            it('Failed (Invalid currentPassword)', async () => {
                 changePasswordData.currentPassword = fakeData(9, 'letters');
                 const res = await reqApi(changePasswordData, token);
                 expect(res.status).toBe(StatusCodes.BAD_REQUEST);
@@ -117,6 +140,11 @@ describe('UserController', () => {
                 const res = await reqApi(token);
                 expect(res.body).toBeDefined();
                 expect(res.body.username).toBe(getUser.username);
+            });
+            it('Failed user not login', async () => {
+                const res = await reqApi('');
+                expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
+                expect(res.body.username).toBeUndefined();
             });
         });
     });
