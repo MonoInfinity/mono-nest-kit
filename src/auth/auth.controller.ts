@@ -32,7 +32,7 @@ export class AuthController {
         const insertedUser = await this.userService.saveUser(newUser);
 
         const accessToken = await this.authService.createAccessToken(insertedUser);
-        return res.send({ token: accessToken });
+        return res.cookie('access-token', accessToken, { maxAge: constant.authController.registerCookieTime }).send({ token: accessToken });
     }
 
     @Post('/login')
@@ -47,7 +47,7 @@ export class AuthController {
         if (!isCorrectPassword) throw new HttpException({ errorMessage: 'error.invalid-password-username' }, StatusCodes.BAD_REQUEST);
 
         const accessToken = await this.authService.createAccessToken(user);
-        return res.send({ token: accessToken });
+        return res.cookie('access-token', accessToken, { maxAge: constant.authController.loginCookieTime }).send({ token: accessToken });
     }
 
     // ---------------------------3rd authentication---------------------------
