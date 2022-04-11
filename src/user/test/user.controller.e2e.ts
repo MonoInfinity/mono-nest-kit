@@ -68,34 +68,33 @@ describe('UserController', () => {
         describe('Update User', () => {
             let getUser: User;
             let newData: UpdateUserDTO;
+            let token;
             const reqApi = (input: UpdateUserDTO, token: string) =>
                 supertest(app.getHttpServer())
                     .put('/api/user')
                     .set({ authorization: `Bearer ${token}` })
                     .send(input);
-            let token;
+
+            const userReqApi = (token: string) =>
+                supertest(app.getHttpServer())
+                    .get('/api/user/me')
+                    .set({ authorization: `Bearer ${token}` });
+
             beforeEach(async () => {
                 getUser = fakeUser();
                 newData = { name: fakeUser().name };
+
                 await userService.saveUser(getUser);
                 token = await authService.createAccessToken(getUser);
             });
 
             it('Pass', async () => {
                 const res = await reqApi(newData, token);
+                const userInfoRes = await userReqApi(token);
+
                 expect(res.status).toBe(StatusCodes.OK);
-            });
-
-            it('Fail (Invalid token)', async () => {
-                const res = await reqApi(newData, '');
-                expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
-            });
-
-            it('Fail (invalid joi validator)', async () => {
-                const invalidNewData = newData;
-                invalidNewData.name = fakeData(4, 'letters');
-                const res = await reqApi(invalidNewData, token);
-                expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+                expect(userInfoRes.body).toBeDefined();
+                expect(userInfoRes.body.name).toBe(newData.name);
             });
         });
     });
