@@ -8,6 +8,7 @@ import * as supertest from 'supertest';
 import { ChangePasswordDTO } from '../dto/changePassword.dto';
 import { StatusCodes } from 'http-status-codes';
 import { User } from 'src/core/models';
+import { UpdateUserDTO } from '../dto';
 
 describe('UserController', () => {
     let app: INestApplication;
@@ -27,6 +28,29 @@ describe('UserController', () => {
     });
 
     describe('Put User', () => {
+        describe('PUT /', () => {
+            let updateUser: UpdateUserDTO;
+            let token;
+            const reqApi = (input: UpdateUserDTO, token: string) =>
+                supertest(app.getHttpServer())
+                    .put('/api/user')
+                    .set({ authorization: `Bearer ${token}` })
+                    .send(input);
+            beforeEach(async () => {
+                const getUser = fakeUser();
+                updateUser = {
+                    name: fakeData(10, 'lettersAndNumbersLowerCase'),
+                };
+                await userService.saveUser(getUser);
+                token = await authService.createAccessToken(getUser);
+            });
+
+            it('Pass', async () => {
+                const res = await reqApi(updateUser, token);
+                expect(res.status).toBe(StatusCodes.OK);
+            });
+        });
+
         describe('PUT /password', () => {
             let changePasswordData: ChangePasswordDTO;
             const reqApi = (input: ChangePasswordDTO, token: string) =>
