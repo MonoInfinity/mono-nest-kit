@@ -8,6 +8,7 @@ import * as supertest from 'supertest';
 import { ChangePasswordDTO } from '../dto/changePassword.dto';
 import { StatusCodes } from 'http-status-codes';
 import { User } from 'src/core/models';
+import { UpdateUserDTO } from '../dto';
 
 describe('UserController', () => {
     let app: INestApplication;
@@ -60,6 +61,40 @@ describe('UserController', () => {
             it('Fail (Invalid currentPassword)', async () => {
                 changePasswordData.currentPassword = fakeData(9, 'letters');
                 const res = await reqApi(changePasswordData, token);
+                expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+            });
+        });
+
+        describe('Update User', () => {
+            let getUser: User;
+            let newData: UpdateUserDTO;
+            const reqApi = (input: UpdateUserDTO, token: string) =>
+                supertest(app.getHttpServer())
+                    .put('/api/user')
+                    .set({ authorization: `Bearer ${token}` })
+                    .send(input);
+            let token;
+            beforeEach(async () => {
+                getUser = fakeUser();
+                newData = { name: fakeUser().name };
+                await userService.saveUser(getUser);
+                token = await authService.createAccessToken(getUser);
+            });
+
+            it('Pass', async () => {
+                const res = await reqApi(newData, token);
+                expect(res.status).toBe(StatusCodes.OK);
+            });
+
+            it('Fail (Invalid token)', async () => {
+                const res = await reqApi(newData, '');
+                expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
+            });
+
+            it('Fail (invalid joi validator)', async () => {
+                const invalidNewData = newData;
+                invalidNewData.name = fakeData(4, 'letters');
+                const res = await reqApi(invalidNewData, token);
                 expect(res.status).toBe(StatusCodes.BAD_REQUEST);
             });
         });
