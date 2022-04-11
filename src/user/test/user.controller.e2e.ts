@@ -7,7 +7,8 @@ import { initTestModule } from '../../core/test/initTest';
 import * as supertest from 'supertest';
 import { ChangePasswordDTO } from '../dto/changePassword.dto';
 import { StatusCodes } from 'http-status-codes';
-import { UpdateUserDTO } from '../dto/updateName.dto';
+import { User } from 'src/core/models';
+import { UpdateUserDTO } from '../dto';
 
 describe('UserController', () => {
     let app: INestApplication;
@@ -75,15 +76,42 @@ describe('UserController', () => {
                 expect(res.status).toBe(StatusCodes.OK);
             });
 
-            it('Fail (Invalid token)', async () => {
+            it('Failed (Invalid token)', async () => {
                 const res = await reqApi(changePasswordData, '');
                 expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
             });
 
-            it('Fail (Invalid currentPassword)', async () => {
+            it('Failed (Invalid currentPassword)', async () => {
                 changePasswordData.currentPassword = fakeData(9, 'letters');
                 const res = await reqApi(changePasswordData, token);
                 expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+            });
+        });
+    });
+
+    describe('Get User', () => {
+        describe('Get /me', () => {
+            let getUser: User;
+            const reqApi = (token: string) =>
+                supertest(app.getHttpServer())
+                    .get('/api/user/me')
+                    .set({ authorization: `Bearer ${token}` });
+            let token;
+            beforeEach(async () => {
+                getUser = fakeUser();
+                await userService.saveUser(getUser);
+                token = await authService.createAccessToken(getUser);
+            });
+
+            it('Pass', async () => {
+                const res = await reqApi(token);
+                expect(res.body).toBeDefined();
+                expect(res.body.username).toBe(getUser.username);
+            });
+            it('Failed user not login', async () => {
+                const res = await reqApi('');
+                expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
+                expect(res.body.username).toBeUndefined();
             });
         });
     });

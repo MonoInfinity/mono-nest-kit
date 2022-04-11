@@ -1,4 +1,4 @@
-import { fakeUser } from './../../core/test/helper';
+import { fakeData, fakeUser } from './../../core/test/helper';
 import { INestApplication } from '@nestjs/common';
 import { UserRepository } from '../../core/repositories';
 import { UserService } from '../../user/user.service';
@@ -22,20 +22,31 @@ describe('UsersController', () => {
     describe('Get Users', () => {
         describe('GET /search', () => {
             beforeEach(async () => {
-                const getUser = fakeUser();
-                await userService.saveUser(getUser);
+                await Promise.all(
+                    Array.from(Array(10).keys()).map(() => {
+                        const getUser = fakeUser();
+                        getUser.username = fakeData(10, 'letters');
+                        return userService.saveUser(getUser);
+                    }),
+                );
             });
 
             it('Pass (valid queries)', async () => {
-                const reqApi = () => supertest(app.getHttpServer()).get('/api/users/search').query({ name: 'a', currentPage: 1, pageSize: 3 });
+                const reqApi = () => supertest(app.getHttpServer()).get('/api/users/search').query({ name: 'a', currentPage: 1, pageSize: 3, orderBy: 'id', order: 'ASC' });
                 const res = await reqApi();
-                expect(res.body.length).not.toBe(0);
+                expect(res.body.count).not.toBe(0);
             });
 
-            it('Pass (invalid queries)', async () => {
+            it('Pass (invalid page & current page)', async () => {
                 const reqApi = () => supertest(app.getHttpServer()).get('/api/users/search').query({ name: '', currentPage: -1, pageSize: -3 });
                 const res = await reqApi();
-                expect(res.body.length).not.toBe(0);
+                expect(res.body.count).not.toBe(0);
+            });
+
+            it('Pass (invalid orderBy)', async () => {
+                const reqApi = () => supertest(app.getHttpServer()).get('/api/users/search').query({ name: '', orderBy: 'aaaa' });
+                const res = await reqApi();
+                expect(res.body.count).toBe(0);
             });
         });
     });
