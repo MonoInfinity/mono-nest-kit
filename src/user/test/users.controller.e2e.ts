@@ -27,10 +27,7 @@ describe('UsersController', () => {
             });
 
             it('Pass (valid queries)', async () => {
-                const reqApi = () =>
-                    supertest(app.getHttpServer())
-                        .get('/api/users/search')
-                        .query({ name: 'a', currentPage: 1, pageSize: 3, orderBy: 'id', order: 'ASC' });
+                const reqApi = () => supertest(app.getHttpServer()).get('/api/users/search').query({ name: 'a', currentPage: 1, pageSize: 3, orderBy: 'id', order: 'ASC' });
                 const res = await reqApi();
                 expect(res.body.count).not.toBe(0);
             });
