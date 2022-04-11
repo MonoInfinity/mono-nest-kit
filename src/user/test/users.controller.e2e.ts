@@ -22,11 +22,13 @@ describe('UsersController', () => {
     describe('Get Users', () => {
         describe('GET /search', () => {
             beforeEach(async () => {
-                for (let i = 0; i < 6; i++) {
-                    const getUser = fakeUser();
-                    getUser.username = fakeData(10, 'letters');
-                    await userService.saveUser(getUser);
-                }
+                await Promise.all(
+                    Array.from(Array(10).keys()).map(() => {
+                        const getUser = fakeUser();
+                        getUser.username = fakeData(10, 'letters');
+                        return userService.saveUser(getUser);
+                    }),
+                );
             });
 
             it('Pass (valid queries)', async () => {
