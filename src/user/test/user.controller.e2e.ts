@@ -52,12 +52,12 @@ describe('UserController', () => {
                 expect(res.status).toBe(StatusCodes.OK);
             });
 
-            it('Fail (Invalid token)', async () => {
+            it('Failed (Invalid token)', async () => {
                 const res = await reqApi(changePasswordData, '');
                 expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
             });
 
-            it('Fail (Invalid currentPassword)', async () => {
+            it('Failed (Invalid currentPassword)', async () => {
                 changePasswordData.currentPassword = fakeData(9, 'letters');
                 const res = await reqApi(changePasswordData, token);
                 expect(res.status).toBe(StatusCodes.BAD_REQUEST);
@@ -83,6 +83,11 @@ describe('UserController', () => {
                 const res = await reqApi(token);
                 expect(res.body).toBeDefined();
                 expect(res.body.username).toBe(getUser.username);
+            });
+            it('Failed user not login', async () => {
+                const res = await reqApi('');
+                expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
+                expect(res.body.username).toBeUndefined();
             });
         });
     });
