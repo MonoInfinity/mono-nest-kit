@@ -42,6 +42,10 @@ export class User {
     @Column({ default: null, unique: true })
     googleId: string;
 
+    @ApiProperty({ description: 'Facebook id' })
+    @Column({ default: null, unique: true })
+    facebookId: string;
+
     @ApiProperty({ description: 'Create date' })
     @Column({ default: new Date().toISOString().slice(0, 19).replace('T', ' ') })
     createDate: Date;

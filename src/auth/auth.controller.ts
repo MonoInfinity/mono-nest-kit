@@ -1,7 +1,6 @@
 import { Body, Controller, Get, HttpException, Post, Req, Res, UseGuards, UsePipes } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiCreatedResponse } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import { StatusCodes } from 'http-status-codes';
@@ -10,6 +9,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { constant } from '../core/constant';
 import { User } from '../core/models';
 import { JoiValidatorPipe } from '../core/pipe/validator.pipe';
+import { config } from '../core';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -62,6 +62,20 @@ export class AuthController {
     async cGoogleAuthRedirect(@Req() req: Request, @Res() res: Response) {
         console.log(req.user);
         const accessToken = await this.authService.createAccessToken(req.user as User);
-        return res.cookie('re-token', accessToken, { maxAge: constant.authController.googleUserCookieTime }).redirect(process.env.CLIENT_URL);
+        return res.cookie('re-token', accessToken, { maxAge: constant.authController.googleUserCookieTime }).redirect(config.GOOGLE_CLIENT_REDIRECT_URL);
+    }
+
+    @Get('/facebook')
+    @UseGuards(AuthGuard('facebook'))
+    async cFacebookAuth() {
+        //
+    }
+
+    @Get('/facebook/callback')
+    @UseGuards(AuthGuard('facebook'))
+    async cFacebookAuthRedirect(@Req() req: Request, @Res() res: Response) {
+        console.log(req.user);
+        const accessToken = await this.authService.createAccessToken(req.user as User);
+        return res.cookie('re-token', accessToken, { maxAge: constant.authController.facebookUserCookieTime }).redirect(config.FACEBOOK_CLIENT_REDIRECT_URL);
     }
 }
