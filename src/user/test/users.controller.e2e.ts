@@ -10,10 +10,11 @@ describe('UsersController', () => {
 
     let userService: UserService;
     let userRepository: UserRepository;
+    let resetDb: () => Promise<void>;
     beforeAll(async () => {
-        const { getApp, module } = await initTestModule();
+        const { getApp, module, resetDatabase } = await initTestModule();
         app = getApp;
-
+        resetDb = resetDatabase;
         userRepository = module.get<UserRepository>(UserRepository);
 
         userService = module.get<UserService>(UserService);
@@ -52,6 +53,7 @@ describe('UsersController', () => {
     });
 
     afterAll(async () => {
+        await resetDb();
         await app.close();
     });
 });

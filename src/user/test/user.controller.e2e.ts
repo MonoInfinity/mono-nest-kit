@@ -16,10 +16,11 @@ describe('UserController', () => {
     let userService: UserService;
     let userRepository: UserRepository;
     let authService: AuthService;
+    let resetDb: () => Promise<void>;
     beforeAll(async () => {
-        const { getApp, module } = await initTestModule();
+        const { getApp, module, resetDatabase } = await initTestModule();
         app = getApp;
-
+        resetDb = resetDatabase;
         userRepository = module.get<UserRepository>(UserRepository);
 
         authService = module.get<AuthService>(AuthService);
@@ -150,6 +151,7 @@ describe('UserController', () => {
     });
 
     afterAll(async () => {
+        await resetDb();
         await app.close();
     });
 });

@@ -53,8 +53,7 @@
         "rxjs": "^7.2.0",
         "swagger-tools": "^0.10.4",
         "swagger-ui-express": "^4.3.0",
-        "typeorm": "^0.2.36",
-        "win-node-env": "^0.6.1"
+        "typeorm": "^0.2.36"
     },
     "devDependencies": {
         "@nestjs/cli": "^7.5.1",

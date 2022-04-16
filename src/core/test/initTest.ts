@@ -1,6 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../../app.module';
+import { UserRepository } from '../repositories';
 import { router } from '../router';
+
+const resetDatabase = async (module: TestingModule) => {
+    const userRepository = module.get<UserRepository>(UserRepository);
+
+    await userRepository.createQueryBuilder().delete().execute();
+    await userRepository.clear();
+};
 
 export const initTestModule = async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -14,9 +22,5 @@ export const initTestModule = async () => {
 
     //create a fake user and token
 
-    return {
-        getApp,
-        module,
-        configModule,
-    };
+    return { resetDatabase: async () => await resetDatabase(module), getApp, module, configModule };
 };

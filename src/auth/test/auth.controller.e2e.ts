@@ -6,7 +6,7 @@ import { AuthService } from '../auth.service';
 import { LoginDTO, RegisterDTO } from '../dto';
 import * as supertest from 'supertest';
 import { fakeUser } from '../../core/test/helper';
-import { User } from 'src/core/models';
+import { User } from '../../core/models';
 import { StatusCodes } from 'http-status-codes';
 
 describe('AuthController', () => {
@@ -15,10 +15,11 @@ describe('AuthController', () => {
     let authService: AuthService;
     let userService: UserService;
     let userRepository: UserRepository;
+    let resetDb: () => Promise<void>;
     beforeAll(async () => {
-        const { getApp, module } = await initTestModule();
+        const { getApp, module, resetDatabase } = await initTestModule();
         app = getApp;
-
+        resetDb = resetDatabase;
         userRepository = module.get<UserRepository>(UserRepository);
 
         authService = module.get<AuthService>(AuthService);
@@ -90,6 +91,7 @@ describe('AuthController', () => {
     });
 
     afterAll(async () => {
+        await resetDb();
         await app.close();
     });
 });
