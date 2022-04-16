@@ -4,6 +4,7 @@ export const constant = Object.freeze({
         registerCookieTime: 1000 * 60 * 60 * 24 * 30,
         googleUserCookieTime: 1000 * 60 * 60 * 24 * 30,
         facebookUserCookieTime: 1000 * 60 * 60 * 24 * 30,
+        tokenName: 'access-token',
     },
     default: {
         orderBy: 'createDate',

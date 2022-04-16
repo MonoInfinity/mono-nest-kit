@@ -16,8 +16,7 @@ export class CustomLoggerService implements LoggerService {
      * Write an 'error' level log.
      */
     error(message: any, ...optionalParams: any[]) {
-        monoLogger.log(NS_APP_ERROR, message);
-        throw message;
+        monoLogger.log(NS_APP_ERROR, optionalParams);
     }
 
     /**

@@ -88,6 +88,16 @@ describe('AuthController', () => {
                 expect(res.status).toBe(StatusCodes.BAD_REQUEST);
             });
         });
+
+        describe('POST /logout', () => {
+            const reqApi = () => supertest(app.getHttpServer()).post(`/api/auth/logout`).send();
+
+            it('Pass', async () => {
+                const res = await reqApi();
+
+                expect(res.status).toBe(201);
+            });
+        });
     });
 
     afterAll(async () => {
