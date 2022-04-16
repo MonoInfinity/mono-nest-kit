@@ -1,28 +1,26 @@
 import { LoggerService } from '@nestjs/common';
 import { monoLogger } from 'mono-utils-core';
-const NS_APP_INFO = 'app-info';
-const NS_APP_ERROR = 'app-error';
-const NS_APP_WARN = 'app-warn';
+import { constant } from '../constant';
 
 export class CustomLoggerService implements LoggerService {
     /**
      * Write a 'log' level log.
      */
     log(message: any, ...optionalParams: any[]) {
-        monoLogger.log(NS_APP_INFO, message);
+        monoLogger.log(constant.NS.APP_INFO, message);
     }
 
     /**
      * Write an 'error' level log.
      */
     error(message: any, ...optionalParams: any[]) {
-        monoLogger.log(NS_APP_ERROR, optionalParams);
+        monoLogger.log(constant.NS.APP_ERROR, optionalParams);
     }
 
     /**
      * Write a 'warn' level log.
      */
     warn(message: any, ...optionalParams: any[]) {
-        monoLogger.log(NS_APP_WARN, message);
+        monoLogger.log(constant.NS.APP_WARN, message);
     }
 }

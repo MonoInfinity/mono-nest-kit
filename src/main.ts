@@ -7,25 +7,24 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 import { monoLogger } from 'mono-utils-core';
-import { config } from './core';
+import { config, constant } from './core';
 import { router } from './core';
 import { CustomLoggerService } from './core/services';
 
-export const NS_APP = 'app-info';
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, { logger: new CustomLoggerService() });
 
     router(app);
 
     await app.listen(config.PORT, () => {
-        monoLogger.log(NS_APP, `Current Mode: ${config.NODE_ENV}`);
-        monoLogger.log(NS_APP, `Listening on port ${config.PORT}`);
-        monoLogger.log(NS_APP, `Ready to service`);
+        monoLogger.log(constant.NS.APP_INFO, `Current Mode: ${config.NODE_ENV}`);
+        monoLogger.log(constant.NS.APP_INFO, `Listening on port ${config.PORT}`);
+        monoLogger.log(constant.NS.APP_INFO, `Ready to service`);
     });
 }
 
-monoLogger.log(NS_APP, `---------------Configuration--------------------`);
-monoLogger.log(NS_APP, config);
-monoLogger.log(NS_APP, `-----------------------------------`);
+monoLogger.log(constant.NS.APP_INFO, `---------------Configuration--------------------`);
+monoLogger.log(constant.NS.APP_INFO, config);
+monoLogger.log(constant.NS.APP_INFO, `-----------------------------------`);
 
 bootstrap();

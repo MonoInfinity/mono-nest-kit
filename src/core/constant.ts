@@ -14,4 +14,10 @@ export const constant = Object.freeze({
         pageSizeLg: 48,
         hashingSalt: 8,
     },
+    NS: {
+        APP_INFO: 'app-info',
+        APP_ERROR: 'app-error',
+        APP_WARN: 'app-warn',
+        HTTP: 'http-app',
+    },
 });
