@@ -17,7 +17,7 @@ import { constant } from '../core';
 export class UserController {
     constructor(private readonly userService: UserService, private readonly authService: AuthService, private readonly emailService: EmailService) {}
 
-    @Post('/send-verify-email')
+    @Post('/verify-email')
     @UsePipes(new JoiValidatorPipe(vRequestVerifyEmailDTO))
     async cSendVerifyEmail(@Body() body: RequestVerifyEmailDTO, @Res() res: Response) {
         const user = await this.userService.findUser('email', body.email);
@@ -37,7 +37,7 @@ export class UserController {
         return res.send();
     }
 
-    @Get('/verify/:otp')
+    @Get('/verify-email/:otp')
     async cVerifyEmail(@Param('otp') otp: string, @Res() res: Response) {
         const { data, error } = await this.authService.verifyToken<JwtToken>(otp);
         if (error) {

@@ -6,21 +6,21 @@ export class CustomLoggerService implements LoggerService {
     /**
      * Write a 'log' level log.
      */
-    log(message: any, ...optionalParams: any[]) {
-        monoLogger.log(constant.NS.APP_INFO, message);
+    log(...optionalParams: any[]) {
+        monoLogger.log(constant.NS.APP_INFO, optionalParams);
     }
 
     /**
      * Write an 'error' level log.
      */
-    error(message: any, ...optionalParams: any[]) {
+    error(...optionalParams: any[]) {
         monoLogger.log(constant.NS.APP_ERROR, optionalParams);
     }
 
     /**
      * Write a 'warn' level log.
      */
-    warn(message: any, ...optionalParams: any[]) {
-        monoLogger.log(constant.NS.APP_WARN, message);
+    warn(...optionalParams: any[]) {
+        monoLogger.log(constant.NS.APP_WARN, optionalParams);
     }
 }
