@@ -32,7 +32,7 @@ export class AuthController {
         const insertedUser = await this.userService.saveUser(newUser);
 
         const accessToken = await this.authService.createAccessToken(insertedUser);
-        return res.cookie('access-token', accessToken, { maxAge: constant.authController.registerCookieTime }).send({ token: accessToken });
+        return res.cookie(constant.authController.tokenName, accessToken, { maxAge: constant.authController.registerCookieTime }).send({ token: accessToken });
     }
 
     @Post('/login')
@@ -47,7 +47,13 @@ export class AuthController {
         if (!isCorrectPassword) throw new HttpException({ errorMessage: 'error.invalid-password-username' }, StatusCodes.BAD_REQUEST);
 
         const accessToken = await this.authService.createAccessToken(user);
-        return res.cookie('access-token', accessToken, { maxAge: constant.authController.loginCookieTime }).send({ token: accessToken });
+        return res.cookie(constant.authController.tokenName, accessToken, { maxAge: constant.authController.loginCookieTime }).send({ token: accessToken });
+    }
+
+    @Post('/logout')
+    @ApiOperation({ summary: 'Logout user account' })
+    async cLogout(@Req() req: Request, @Res() res: Response) {
+        return res.cookie(constant.authController.tokenName, '', { maxAge: -999 }).send();
     }
 
     // ---------------------------3rd authentication---------------------------
@@ -60,9 +66,8 @@ export class AuthController {
     @Get('/google/callback')
     @UseGuards(AuthGuard('google'))
     async cGoogleAuthRedirect(@Req() req: Request, @Res() res: Response) {
-        console.log(req.user);
         const accessToken = await this.authService.createAccessToken(req.user as User);
-        return res.cookie('re-token', accessToken, { maxAge: constant.authController.googleUserCookieTime }).redirect(config.GOOGLE_CLIENT_REDIRECT_URL);
+        return res.cookie(constant.authController.tokenName, accessToken, { maxAge: constant.authController.googleUserCookieTime }).redirect(config.GOOGLE_CLIENT_REDIRECT_URL);
     }
 
     @Get('/facebook')
@@ -74,8 +79,7 @@ export class AuthController {
     @Get('/facebook/callback')
     @UseGuards(AuthGuard('facebook'))
     async cFacebookAuthRedirect(@Req() req: Request, @Res() res: Response) {
-        console.log(req.user);
         const accessToken = await this.authService.createAccessToken(req.user as User);
-        return res.cookie('re-token', accessToken, { maxAge: constant.authController.facebookUserCookieTime }).redirect(config.FACEBOOK_CLIENT_REDIRECT_URL);
+        return res.cookie(constant.authController.tokenName, accessToken, { maxAge: constant.authController.facebookUserCookieTime }).redirect(config.FACEBOOK_CLIENT_REDIRECT_URL);
     }
 }

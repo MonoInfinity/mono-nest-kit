@@ -16,13 +16,5 @@ module.exports = {
     globalSetup: '<rootDir>/core/test/globalSetup.ts',
     coverageDirectory: '../coverage',
     testEnvironment: 'node',
-    coveragePathIgnorePatterns: [
-        '<rootDir>/main.ts',
-        '<rootDir>/router.ts',
-        '<rootDir>/app',
-        '<rootDir>/utils/logger',
-        '<rootDir>/utils/repository',
-        '<rootDir>/utils/validator',
-        '<rootDir>/test',
-    ],
+    coveragePathIgnorePatterns: ['<rootDir>/main.ts', '<rootDir>/router.ts', '<rootDir>/app', '<rootDir>/utils/logger', '<rootDir>/utils/repository', '<rootDir>/utils/validator', '<rootDir>/test'],
 };

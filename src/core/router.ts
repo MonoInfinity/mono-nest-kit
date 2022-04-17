@@ -2,10 +2,12 @@ import { INestApplication } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
 import * as cookieParser from 'cookie-parser';
 import { config } from './config';
-import { monoEnum } from 'mono-utils-core';
+import { monoEnum, monoLogger } from 'mono-utils-core';
 import helmet from 'helmet';
 import * as compression from 'compression';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import * as morgan from 'morgan';
+import { constant } from '.';
 
 export function router(app: INestApplication) {
     app.use(cookieParser());
@@ -26,6 +28,11 @@ export function router(app: INestApplication) {
         app.use(helmet());
         app.use(compression());
     }
+    app.use(
+        morgan('dev', {
+            stream: { write: (msg) => monoLogger.log(constant.NS.HTTP, msg) },
+        }),
+    );
     //handle for multiple language
     app.use((req: Request, res: Response, next: NextFunction) => {
         res.header('Access-Control-Allow-Methods', 'POST, GET, PUT');

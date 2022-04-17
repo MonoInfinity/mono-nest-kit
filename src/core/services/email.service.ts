@@ -1,41 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { MailDataRequired, MailService } from '@sendgrid/mail';
-import { monoEnum } from 'mono-utils-core';
+import { monoEnum, monoLogger } from 'mono-utils-core';
 import { config } from '../config';
-import { CustomLoggerService } from './logger.service';
+import { constant } from '../constant';
 
 @Injectable()
 export class EmailService {
-    constructor(private readonly mailService: MailService, private readonly customLoggerService: CustomLoggerService) {}
+    constructor(private readonly mailService: MailService) {}
 
     private sendMail(receiver: string, subject: string, content: string) {
         const mail: MailDataRequired = {
             to: receiver,
             from: config.SENDGRID_SENDER,
             subject: subject,
-            html: `<div>
-                        <p>${content}</p>
-                        </br>
-                        <p>Thanks,</p>
-                        <p>Mono Infinity Team</p>
-                    </div>`,
+            html: `<div>${content}</div>`,
             mailSettings: {
                 sandboxMode: {
-                    // enable: config.NODE_ENV === monoEnum.NODE_ENV_MODE.DEVELOPMENT || config.NODE_ENV === monoEnum.NODE_ENV_MODE.TEST,
-                    enable: false,
+                    enable: config.NODE_ENV !== monoEnum.NODE_ENV_MODE.PRODUCTION,
                 },
             },
         };
 
         return this.mailService
             .send(mail)
-            .then((res) => {
-                console.log(res);
-                return true;
-            })
+            .then(() => true)
             .catch((error) => {
-                console.log(error.response.body);
-                this.customLoggerService.error(error.response.body, 'email.service.ts', 'error');
+                monoLogger.log(constant.NS.APP_ERROR, error.response.body);
                 return false;
             });
     }
