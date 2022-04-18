@@ -22,10 +22,6 @@ export class User {
     @Column({ default: null })
     name: string;
 
-    @ApiProperty({ description: 'Username' })
-    @Column({ default: null })
-    username: string;
-
     @ApiProperty({ description: 'Password' })
     @Column({ default: null })
     password: string;
@@ -65,6 +61,7 @@ export class User {
 
 export const userValidateSchema = {
     name: joi.string().min(5).max(40).trim().lowercase().required(),
+    email: joi.string().min(5).max(255).email().trim().lowercase().required(),
     username: joi.string().max(32).min(5).lowercase().alphanum().required(),
     password: joiPassword.string().min(8).max(32).trim().alphanum().required(),
 };

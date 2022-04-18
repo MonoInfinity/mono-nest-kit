@@ -1,6 +1,6 @@
 import { AuthService } from './../../auth/auth.service';
 import { fakeData, fakeUser } from './../../core/test/helper';
-import { INestApplication } from '@nestjs/common';
+import { HttpCode, INestApplication } from '@nestjs/common';
 import { UserRepository } from '../../core/repositories';
 import { UserService } from '../../user/user.service';
 import { initTestModule } from '../../core/test/initTest';
@@ -8,7 +8,7 @@ import * as supertest from 'supertest';
 import { ChangePasswordDTO } from '../dto/changePassword.dto';
 import { StatusCodes } from 'http-status-codes';
 import { User } from 'src/core/models';
-import { UpdateUserDTO } from '../dto';
+import { RequestVerifyEmailDTO, UpdateUserDTO } from '../dto';
 
 describe('UserController', () => {
     let app: INestApplication;
@@ -26,6 +26,29 @@ describe('UserController', () => {
         authService = module.get<AuthService>(AuthService);
 
         userService = module.get<UserService>(UserService);
+    });
+
+    describe('Post User', () => {
+        describe('POST /verify-email', () => {
+            const reqApi = (input: RequestVerifyEmailDTO) => supertest(app.getHttpServer()).post('/api/user/verify-email').send(input);
+            let user: User;
+            beforeEach(async () => {
+                user = fakeUser();
+                user.isVerified = false;
+                await userService.saveUser(user);
+            });
+
+            it('Pass', async () => {
+                const res = await reqApi({ email: user.email });
+                expect(res.status).toBe(StatusCodes.CREATED);
+            });
+            it('Failed email not found', async () => {
+                user.email = 'hello@gmail.com';
+
+                const res = await reqApi({ email: user.email });
+                expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+            });
+        });
     });
 
     describe('Put User', () => {
@@ -140,7 +163,7 @@ describe('UserController', () => {
             it('Pass', async () => {
                 const res = await reqApi(token);
                 expect(res.body).toBeDefined();
-                expect(res.body.username).toBe(getUser.username);
+                expect(res.body.email).toBe(getUser.email);
             });
             it('Failed user not login', async () => {
                 const res = await reqApi('');

@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { HttpCode, INestApplication } from '@nestjs/common';
 import { UserRepository } from '../../core/repositories';
 import { UserService } from '../../user/user.service';
 import { initTestModule } from '../../core/test/initTest';
@@ -35,7 +35,7 @@ describe('AuthController', () => {
             beforeEach(async () => {
                 const getUser = fakeUser();
                 loginUserData = {
-                    username: getUser.username,
+                    email: getUser.email,
                     password: getUser.password,
                 };
                 getUser.password = await authService.encryptPassword(getUser.password, 2);
@@ -49,15 +49,16 @@ describe('AuthController', () => {
             });
 
             it('Failed (username is not correct)', async () => {
-                loginUserData.username = 'updateaaabbbccc';
+                loginUserData.email = 'updateaaabbbccc@gmail.com';
                 const res = await reqApi(loginUserData);
-                expect(res.status).toBe(400);
+
+                expect(res.status).toBe(StatusCodes.BAD_REQUEST);
             });
 
             it('Failed (password is not correct)', async () => {
                 loginUserData.password = '123AABBDASDaa';
                 const res = await reqApi(loginUserData);
-                expect(res.status).toBe(400);
+                expect(res.status).toBe(StatusCodes.BAD_REQUEST);
             });
         });
 
@@ -68,7 +69,7 @@ describe('AuthController', () => {
             beforeEach(async () => {
                 getUser = fakeUser();
                 registerData = {
-                    username: getUser.username,
+                    email: getUser.email,
                     password: getUser.password,
                     confirmPassword: getUser.password,
                     name: getUser.name,
@@ -76,7 +77,7 @@ describe('AuthController', () => {
             });
             it('Pass', async () => {
                 const res = await reqApi(registerData);
-                const user = await userRepository.findOneByField('username', getUser.username);
+                const user = await userRepository.findOneByField('email', getUser.email);
 
                 expect(user.name).toBe(getUser.name);
                 expect(res.body.token).not.toBeNull();
@@ -95,7 +96,7 @@ describe('AuthController', () => {
             it('Pass', async () => {
                 const res = await reqApi();
 
-                expect(res.status).toBe(201);
+                expect(res.status).toBe(StatusCodes.CREATED);
             });
         });
     });

@@ -21,12 +21,12 @@ export class AuthController {
     @ApiCreatedResponse({ type: String, description: 'access token' })
     @UsePipes(new JoiValidatorPipe(vRegisterDTO))
     async cRegister(@Body() body: RegisterDTO, @Res() res: Response) {
-        const user = await this.userService.findUser('username', body.username);
-        if (user) throw new HttpException({ username: 'field.field-taken' }, StatusCodes.BAD_REQUEST);
+        const user = await this.userService.findUser('email', body.email);
+        if (user) throw new HttpException({ email: 'field.field-taken' }, StatusCodes.BAD_REQUEST);
 
         const newUser = new User();
         newUser.name = body.name;
-        newUser.username = body.username;
+        newUser.email = body.email;
         newUser.password = await this.authService.encryptPassword(body.password, constant.default.hashingSalt);
 
         const insertedUser = await this.userService.saveUser(newUser);
@@ -40,7 +40,7 @@ export class AuthController {
     @ApiCreatedResponse({ type: String, description: 'access token' })
     @UsePipes(new JoiValidatorPipe(vLoginDTO))
     async cLogin(@Body() body: LoginDTO, @Res() res: Response) {
-        const user = await this.userService.findUser('username', body.username);
+        const user = await this.userService.findUser('email', body.email);
         if (!user) throw new HttpException({ errorMessage: 'error.invalid-password-username' }, StatusCodes.BAD_REQUEST);
 
         const isCorrectPassword = await this.authService.decryptPassword(body.password, user.password);

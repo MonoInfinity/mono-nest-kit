@@ -1,4 +1,4 @@
-import { fakeData, fakeUser } from './../../core/test/helper';
+import { fakeUser } from './../../core/test/helper';
 import { INestApplication } from '@nestjs/common';
 import { UserRepository } from '../../core/repositories';
 import { UserService } from '../../user/user.service';
@@ -26,7 +26,6 @@ describe('UsersController', () => {
                 await Promise.all(
                     Array.from(Array(10).keys()).map(() => {
                         const getUser = fakeUser();
-                        getUser.username = fakeData(10, 'letters');
                         return userService.saveUser(getUser);
                     }),
                 );
