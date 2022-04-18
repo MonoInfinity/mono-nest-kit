@@ -28,9 +28,9 @@ export class UserController {
 
         const otp = await this.authService.createAccessToken(user, 5);
 
-        try {
-            await this.emailService.sendEmailForVerify(user.email, otp);
-        } catch (error) {
+        const isSend = await this.emailService.sendEmailForVerify(user.email, otp);
+
+        if (!isSend) {
             throw new HttpException({ errorMessage: 'error.something_wrong' }, StatusCodes.INTERNAL_SERVER_ERROR);
         }
 

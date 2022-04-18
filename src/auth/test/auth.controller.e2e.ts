@@ -1,4 +1,4 @@
-import { HttpCode, INestApplication } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { UserRepository } from '../../core/repositories';
 import { UserService } from '../../user/user.service';
 import { initTestModule } from '../../core/test/initTest';

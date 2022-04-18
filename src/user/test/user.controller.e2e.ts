@@ -9,6 +9,8 @@ import { ChangePasswordDTO } from '../dto/changePassword.dto';
 import { StatusCodes } from 'http-status-codes';
 import { User } from 'src/core/models';
 import { RequestVerifyEmailDTO, UpdateUserDTO } from '../dto';
+import { EmailService } from '../../core/services';
+import { randomUUID } from 'crypto';
 
 describe('UserController', () => {
     let app: INestApplication;
@@ -16,13 +18,14 @@ describe('UserController', () => {
     let userService: UserService;
     let userRepository: UserRepository;
     let authService: AuthService;
+    let emailService: EmailService;
     let resetDb: () => Promise<void>;
     beforeAll(async () => {
         const { getApp, module, resetDatabase } = await initTestModule();
         app = getApp;
         resetDb = resetDatabase;
         userRepository = module.get<UserRepository>(UserRepository);
-
+        emailService = module.get<EmailService>(EmailService);
         authService = module.get<AuthService>(AuthService);
 
         userService = module.get<UserService>(UserService);
@@ -47,6 +50,52 @@ describe('UserController', () => {
 
                 const res = await reqApi({ email: user.email });
                 expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+            });
+
+            it('Failed email service went wrong', async () => {
+                const mySpy = jest.spyOn(emailService, 'sendEmailForVerify').mockImplementation(() => Promise.resolve(false));
+
+                const res = await reqApi({ email: user.email });
+                expect(res.status).toBe(StatusCodes.INTERNAL_SERVER_ERROR);
+
+                mySpy.mockClear();
+            });
+        });
+
+        describe('GET /verify-email/:otp', () => {
+            const reqApi = (otp: string) => supertest(app.getHttpServer()).get(`/api/user/verify-email/${otp}`).send();
+            let user: User;
+            let otp: string;
+            beforeEach(async () => {
+                user = fakeUser();
+                user.isVerified = false;
+                await userService.saveUser(user);
+
+                otp = await authService.createAccessToken(user, 5);
+            });
+
+            it('Pass', async () => {
+                const res = await reqApi(otp);
+                const getUser = await userRepository.findOne({ email: user.email });
+                expect(getUser.isVerified).toBeTruthy();
+                expect(res.status).toBe(StatusCodes.OK);
+            });
+
+            it('Failed invalid token', async () => {
+                const res = await reqApi('hello');
+                const getUser = await userRepository.findOne({ email: user.email });
+
+                expect(getUser.isVerified).toBeFalsy();
+                expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
+            });
+
+            it('Failed invalid token', async () => {
+                const token = await authService.createAccessToken({ ...fakeUser(), id: randomUUID() }, 5);
+                const res = await reqApi(token);
+                const getUser = await userRepository.findOne({ email: user.email });
+
+                expect(getUser.isVerified).toBeFalsy();
+                expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
             });
         });
     });
