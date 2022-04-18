@@ -3,8 +3,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { userValidateSchema } from '../../core/models';
 
 export class RegisterDTO {
-    @ApiProperty({ description: 'Username', example: 'haicao' })
-    username: string;
+    @ApiProperty({ description: 'Username', example: 'haicao@gmail.com' })
+    email: string;
 
     @ApiProperty({ description: 'Name', example: 'Cao Chi Hai' })
     name: string;
@@ -18,7 +18,7 @@ export class RegisterDTO {
 
 export const vRegisterDTO = joi.object<RegisterDTO>({
     name: userValidateSchema.name,
-    username: userValidateSchema.username,
+    email: userValidateSchema.email,
     password: userValidateSchema.password,
     confirmPassword: joi.string().required().valid(joi.ref('password')),
 });

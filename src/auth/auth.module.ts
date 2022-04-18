@@ -6,9 +6,10 @@ import { UserModule } from '../user/user.module';
 import { GoogleStrategy } from './passport/google.strategy';
 import { FacebookStrategy } from './passport/facebook.strategy';
 import { config } from '../core';
+import { EmailModule } from '../core/providers';
 
 @Module({
-    imports: [forwardRef(() => UserModule)],
+    imports: [forwardRef(() => UserModule), EmailModule],
     controllers: [AuthController],
     providers: [
         AuthService,

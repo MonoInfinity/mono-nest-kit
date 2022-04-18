@@ -1,6 +1,6 @@
 import { AuthService } from './../../auth/auth.service';
 import { fakeData, fakeUser } from './../../core/test/helper';
-import { INestApplication } from '@nestjs/common';
+import { HttpCode, INestApplication } from '@nestjs/common';
 import { UserRepository } from '../../core/repositories';
 import { UserService } from '../../user/user.service';
 import { initTestModule } from '../../core/test/initTest';
@@ -8,7 +8,10 @@ import * as supertest from 'supertest';
 import { ChangePasswordDTO } from '../dto/changePassword.dto';
 import { StatusCodes } from 'http-status-codes';
 import { User } from 'src/core/models';
-import { RequestVerifyEmailDTO, UpdateUserDTO } from '../dto';
+import { UpdateUserDTO } from '../dto';
+import { EmailService } from '../../core/providers';
+import { randomUUID } from 'crypto';
+import { RequestVerifyEmailDTO } from 'src/auth/dto';
 
 describe('UserController', () => {
     let app: INestApplication;
@@ -16,13 +19,14 @@ describe('UserController', () => {
     let userService: UserService;
     let userRepository: UserRepository;
     let authService: AuthService;
+    let emailService: EmailService;
     let resetDb: () => Promise<void>;
     beforeAll(async () => {
         const { getApp, module, resetDatabase } = await initTestModule();
         app = getApp;
         resetDb = resetDatabase;
         userRepository = module.get<UserRepository>(UserRepository);
-
+        emailService = module.get<EmailService>(EmailService);
         authService = module.get<AuthService>(AuthService);
 
         userService = module.get<UserService>(UserService);
@@ -140,7 +144,7 @@ describe('UserController', () => {
             it('Pass', async () => {
                 const res = await reqApi(token);
                 expect(res.body).toBeDefined();
-                expect(res.body.username).toBe(getUser.username);
+                expect(res.body.email).toBe(getUser.email);
             });
             it('Failed user not login', async () => {
                 const res = await reqApi('');
@@ -160,7 +164,7 @@ describe('UserController', () => {
             it('Pass', async () => {
                 const res = await reqApi(getUser.id);
                 expect(res.body).toBeDefined();
-                expect(res.body.username).toBe(getUser.username);
+                expect(res.body.email).toBe(getUser.email);
             });
         });
     });
@@ -171,13 +175,13 @@ describe('UserController', () => {
         let otp;
         const sendApi = (input: RequestVerifyEmailDTO, token: string) =>
             supertest(app.getHttpServer())
-                .post('/api/user/verify-email')
+                .post('/api/auth/verify-email')
                 .set({ authorization: `Bearer ${token}` })
                 .send(input);
 
         const verifyApi = (token, otp) =>
             supertest(app.getHttpServer())
-                .get(`/api/user/verify-email/${otp}`)
+                .get(`/api/auth/verify-email/${otp}`)
                 .set({ authorization: `Bearer ${token}` });
 
         beforeEach(async () => {
@@ -190,7 +194,7 @@ describe('UserController', () => {
         it('POST /verify-email', async () => {
             const res = await sendApi({ email: getUser.email }, token);
             expect(res).toBeDefined();
-            expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+            expect(res.status).toBe(StatusCodes.CREATED);
         });
 
         it('GET /verify-email/:otp', async () => {
