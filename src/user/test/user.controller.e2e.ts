@@ -11,6 +11,7 @@ import { User } from 'src/core/models';
 import { UpdateUserDTO } from '../dto';
 import { EmailService } from '../../core/providers';
 import { randomUUID } from 'crypto';
+import { RequestVerifyEmailDTO } from 'src/auth/dto';
 
 describe('UserController', () => {
     let app: INestApplication;
@@ -92,7 +93,7 @@ describe('UserController', () => {
             });
         });
 
-        describe('Update User', () => {
+        describe('PUT /user', () => {
             let getUser: User;
             let newData: UpdateUserDTO;
             let token;
@@ -150,6 +151,56 @@ describe('UserController', () => {
                 expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
                 expect(res.body.username).toBeUndefined();
             });
+        });
+
+        describe('Get /user/:userId', () => {
+            let getUser: User;
+            const reqApi = (userId: string) => supertest(app.getHttpServer()).get(`/api/user/${userId}`);
+            beforeEach(async () => {
+                getUser = fakeUser();
+                await userService.saveUser(getUser);
+            });
+
+            it('Pass', async () => {
+                const res = await reqApi(getUser.id);
+                expect(res.body).toBeDefined();
+                expect(res.body.email).toBe(getUser.email);
+            });
+        });
+    });
+
+    describe('API /verify-email', () => {
+        let getUser: User;
+        let token;
+        let otp;
+        const sendApi = (input: RequestVerifyEmailDTO, token: string) =>
+            supertest(app.getHttpServer())
+                .post('/api/auth/verify-email')
+                .set({ authorization: `Bearer ${token}` })
+                .send(input);
+
+        const verifyApi = (token, otp) =>
+            supertest(app.getHttpServer())
+                .get(`/api/auth/verify-email/${otp}`)
+                .set({ authorization: `Bearer ${token}` });
+
+        beforeEach(async () => {
+            getUser = fakeUser();
+            await userService.saveUser(getUser);
+            token = await authService.createAccessToken(getUser);
+            otp = await authService.createAccessToken(getUser, 5);
+        });
+
+        it('POST /verify-email', async () => {
+            const res = await sendApi({ email: getUser.email }, token);
+            expect(res).toBeDefined();
+            expect(res.status).toBe(StatusCodes.CREATED);
+        });
+
+        it('GET /verify-email/:otp', async () => {
+            const res = await verifyApi(token, otp);
+            expect(res).toBeDefined();
+            expect(res.status).toBe(StatusCodes.OK);
         });
     });
 
