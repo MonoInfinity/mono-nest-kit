@@ -1,20 +1,60 @@
-import { Body, Controller, Get, HttpException, Post, Req, Res, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Param, Post, Req, Res, UseGuards, UsePipes } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiCreatedResponse } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import { StatusCodes } from 'http-status-codes';
-import { LoginDTO, vLoginDTO, RegisterDTO, vRegisterDTO } from './dto';
+import { LoginDTO, vLoginDTO, RegisterDTO, vRegisterDTO, vRequestVerifyEmailDTO, RequestVerifyEmailDTO } from './dto';
 import { AuthGuard } from '@nestjs/passport';
 import { constant } from '../core/constant';
 import { User } from '../core/models';
 import { JoiValidatorPipe } from '../core/pipe/validator.pipe';
 import { config } from '../core';
+import { JwtToken } from '../core/interface';
+import { EmailService } from '../core/providers';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService, private readonly userService: UserService) {}
+    constructor(private readonly authService: AuthService, private readonly userService: UserService, private readonly emailService: EmailService) {}
+
+    @Post('/verify-email')
+    @UsePipes(new JoiValidatorPipe(vRequestVerifyEmailDTO))
+    async cSendVerifyEmail(@Body() body: RequestVerifyEmailDTO, @Res() res: Response) {
+        const user = await this.userService.findUser('email', body.email);
+
+        if (!user) {
+            throw new HttpException({ errorMessage: 'error.not_found' }, StatusCodes.BAD_REQUEST);
+        }
+
+        const otp = await this.authService.createAccessToken(user, 5);
+
+        const isSend = await this.emailService.sendEmailForVerify(user.email, otp);
+
+        if (!isSend) {
+            throw new HttpException({ errorMessage: 'error.something_wrong' }, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+
+        return res.send();
+    }
+
+    @Get('/verify-email/:otp')
+    async cVerifyEmail(@Param('otp') otp: string, @Res() res: Response) {
+        const { data, error } = await this.authService.verifyToken<JwtToken>(otp);
+        if (error) {
+            throw new HttpException({ errorMessage: '' }, StatusCodes.UNAUTHORIZED);
+        }
+
+        const user = await this.userService.findUser('id', data.id);
+        if (!user) {
+            throw new HttpException({ errorMessage: '' }, StatusCodes.UNAUTHORIZED);
+        }
+
+        user.isVerified = true;
+        await this.userService.saveUser(user);
+
+        return res.send();
+    }
 
     @Post('/register')
     @ApiOperation({ summary: 'Create new user' })

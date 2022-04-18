@@ -8,5 +8,5 @@ export class RequestVerifyEmailDTO {
 }
 
 export const vRequestVerifyEmailDTO = joi.object<RequestVerifyEmailDTO>({
-    email: userValidateSchema.name,
+    email: userValidateSchema.email,
 });

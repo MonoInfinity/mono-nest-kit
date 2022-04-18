@@ -9,7 +9,7 @@ import { AppModule } from './app.module';
 import { monoLogger } from 'mono-utils-core';
 import { config, constant } from './core';
 import { router } from './core';
-import { CustomLoggerService } from './core/services';
+import { CustomLoggerService } from './core/providers';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, { logger: new CustomLoggerService() });

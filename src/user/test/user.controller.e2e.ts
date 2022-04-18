@@ -8,8 +8,8 @@ import * as supertest from 'supertest';
 import { ChangePasswordDTO } from '../dto/changePassword.dto';
 import { StatusCodes } from 'http-status-codes';
 import { User } from 'src/core/models';
-import { RequestVerifyEmailDTO, UpdateUserDTO } from '../dto';
-import { EmailService } from '../../core/services';
+import { UpdateUserDTO } from '../dto';
+import { EmailService } from '../../core/providers';
 import { randomUUID } from 'crypto';
 
 describe('UserController', () => {
@@ -29,75 +29,6 @@ describe('UserController', () => {
         authService = module.get<AuthService>(AuthService);
 
         userService = module.get<UserService>(UserService);
-    });
-
-    describe('Post User', () => {
-        describe('POST /verify-email', () => {
-            const reqApi = (input: RequestVerifyEmailDTO) => supertest(app.getHttpServer()).post('/api/user/verify-email').send(input);
-            let user: User;
-            beforeEach(async () => {
-                user = fakeUser();
-                user.isVerified = false;
-                await userService.saveUser(user);
-            });
-
-            it('Pass', async () => {
-                const res = await reqApi({ email: user.email });
-                expect(res.status).toBe(StatusCodes.CREATED);
-            });
-            it('Failed email not found', async () => {
-                user.email = 'hello@gmail.com';
-
-                const res = await reqApi({ email: user.email });
-                expect(res.status).toBe(StatusCodes.BAD_REQUEST);
-            });
-
-            it('Failed email service went wrong', async () => {
-                const mySpy = jest.spyOn(emailService, 'sendEmailForVerify').mockImplementation(() => Promise.resolve(false));
-
-                const res = await reqApi({ email: user.email });
-                expect(res.status).toBe(StatusCodes.INTERNAL_SERVER_ERROR);
-
-                mySpy.mockClear();
-            });
-        });
-
-        describe('GET /verify-email/:otp', () => {
-            const reqApi = (otp: string) => supertest(app.getHttpServer()).get(`/api/user/verify-email/${otp}`).send();
-            let user: User;
-            let otp: string;
-            beforeEach(async () => {
-                user = fakeUser();
-                user.isVerified = false;
-                await userService.saveUser(user);
-
-                otp = await authService.createAccessToken(user, 5);
-            });
-
-            it('Pass', async () => {
-                const res = await reqApi(otp);
-                const getUser = await userRepository.findOne({ email: user.email });
-                expect(getUser.isVerified).toBeTruthy();
-                expect(res.status).toBe(StatusCodes.OK);
-            });
-
-            it('Failed invalid token', async () => {
-                const res = await reqApi('hello');
-                const getUser = await userRepository.findOne({ email: user.email });
-
-                expect(getUser.isVerified).toBeFalsy();
-                expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
-            });
-
-            it('Failed invalid token', async () => {
-                const token = await authService.createAccessToken({ ...fakeUser(), id: randomUUID() }, 5);
-                const res = await reqApi(token);
-                const getUser = await userRepository.findOne({ email: user.email });
-
-                expect(getUser.isVerified).toBeFalsy();
-                expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
-            });
-        });
     });
 
     describe('Put User', () => {
