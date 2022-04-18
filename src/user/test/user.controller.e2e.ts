@@ -201,7 +201,7 @@ describe('UserController', () => {
     });
 
     afterAll(async () => {
-        // await resetDb();
+        await resetDb();
         await app.close();
     });
 });
