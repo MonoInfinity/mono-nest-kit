@@ -1,0 +1,12 @@
+
+version: '3'
+services:
+    server:
+        build: .
+        container_name: server
+        image: loc05st/hello:latest
+        env_file:
+            - ./config/.env.production
+        ports:
+            - 4000:4000
+    
