@@ -2,6 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { joiPasswordExtendCore, JoiPasswordExtend } from 'joi-password';
 import * as joi from 'joi';
+
 const joiPassword: JoiPasswordExtend = joi.extend(joiPasswordExtendCore);
 
 export enum UserStatus {
@@ -40,10 +41,10 @@ export class User {
     googleId: string;
 
     @ApiProperty({ description: 'Create date' })
-    createAt: string;
+    createAt: number;
 
     @ApiProperty({ description: 'Create date' })
-    updateAt: string;
+    updateAt: number;
 
     @ApiProperty({ description: 'Status' })
     @Column({ default: UserStatus.ACTIVE })

@@ -23,7 +23,7 @@ export class AuthGuard implements CanActivate {
             throw new HttpException({}, StatusCodes.UNAUTHORIZED);
         }
 
-        const user = await this.userService.findUser('id', data.id);
+        const user = await this.userService.findOne('id', data.id);
 
         if (!user) {
             throw new HttpException({}, StatusCodes.UNAUTHORIZED);

@@ -46,7 +46,7 @@ describe('UserController', () => {
                 updateUser = {
                     name: fakeData(10, 'lettersAndNumbersLowerCase'),
                 };
-                await userService.saveUser(getUser);
+                await userService.updateOne(getUser);
                 token = await authService.createAccessToken(getUser);
             });
 
@@ -72,7 +72,7 @@ describe('UserController', () => {
                     confirmNewPassword: getUser.password,
                 };
                 getUser.password = await authService.encryptPassword(getUser.password, 2);
-                await userService.saveUser(getUser);
+                await userService.updateOne(getUser);
                 token = await authService.createAccessToken(getUser);
             });
 
@@ -112,7 +112,7 @@ describe('UserController', () => {
                 getUser = fakeUser();
                 newData = { name: fakeUser().name };
 
-                await userService.saveUser(getUser);
+                await userService.updateOne(getUser);
                 token = await authService.createAccessToken(getUser);
             });
 
@@ -137,7 +137,7 @@ describe('UserController', () => {
             let token;
             beforeEach(async () => {
                 getUser = fakeUser();
-                await userService.saveUser(getUser);
+                await userService.updateOne(getUser);
                 token = await authService.createAccessToken(getUser);
             });
 
@@ -158,7 +158,7 @@ describe('UserController', () => {
             const reqApi = (userId: string) => supertest(app.getHttpServer()).get(`/api/user/${userId}`);
             beforeEach(async () => {
                 getUser = fakeUser();
-                await userService.saveUser(getUser);
+                await userService.updateOne(getUser);
             });
 
             it('Pass', async () => {
@@ -186,7 +186,7 @@ describe('UserController', () => {
 
         beforeEach(async () => {
             getUser = fakeUser();
-            await userService.saveUser(getUser);
+            await userService.updateOne(getUser);
             token = await authService.createAccessToken(getUser);
             otp = await authService.createAccessToken(getUser, 5);
         });

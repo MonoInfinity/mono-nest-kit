@@ -2,10 +2,25 @@ import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
-import { User } from '../core/models';
+import { User, UserRole, UserStatus } from '../core/models';
+import { UserRepository } from '../core/repositories';
+import { constant } from '../core';
 @Injectable()
 export class AuthService {
-    constructor(private readonly jwtService: JwtService) {}
+    constructor(private readonly jwtService: JwtService, private readonly userRepository: UserRepository) {}
+
+    async createOne(name: string, email: string, password: string) {
+        const user = new User();
+        user.name = name;
+        user.email = email;
+        user.password = await this.encryptPassword(password, constant.default.hashingSalt);
+        user.isVerified = false;
+        user.createAt = new Date().getTime();
+        user.updateAt = new Date().getTime();
+        user.status = UserStatus.ACTIVE;
+        user.role = UserRole.USER;
+        return await this.userRepository.save(user);
+    }
 
     // ---------------------------Bcrypt Service---------------------------
     async encryptPassword(password: string, saltOrRounds: number): Promise<string> {

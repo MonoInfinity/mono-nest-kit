@@ -18,13 +18,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
 
     async validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) {
         try {
-            let user = await this.userService.findUser('googleId', profile.id);
+            let user = await this.userService.findOne('googleId', profile.id);
             if (!user) {
                 user = new User();
                 user.googleId = profile.id;
                 user.name = profile.displayName;
                 user.email = profile._json.email;
-                user = await this.userService.saveUser(user);
+                user = await this.userService.updateOne(user);
             }
             done(null, user);
         } catch (err) {

@@ -21,7 +21,7 @@ export class AuthController {
     @Post('/verify-email')
     @UsePipes(new JoiValidatorPipe(vRequestVerifyEmailDTO))
     async cSendVerifyEmail(@Body() body: RequestVerifyEmailDTO, @Res() res: Response) {
-        const user = await this.userService.findUser('email', body.email);
+        const user = await this.userService.findOne('email', body.email);
 
         if (!user) {
             throw new HttpException({ errorMessage: 'error.not_found' }, StatusCodes.BAD_REQUEST);
@@ -45,13 +45,13 @@ export class AuthController {
             throw new HttpException({ errorMessage: '' }, StatusCodes.UNAUTHORIZED);
         }
 
-        const user = await this.userService.findUser('id', data.id);
+        const user = await this.userService.findOne('id', data.id);
         if (!user) {
             throw new HttpException({ errorMessage: '' }, StatusCodes.UNAUTHORIZED);
         }
 
         user.isVerified = true;
-        await this.userService.saveUser(user);
+        await this.userService.updateOne(user);
 
         return res.send();
     }
@@ -61,17 +61,11 @@ export class AuthController {
     @ApiCreatedResponse({ type: String, description: 'access token' })
     @UsePipes(new JoiValidatorPipe(vRegisterDTO))
     async cRegister(@Body() body: RegisterDTO, @Res() res: Response) {
-        const user = await this.userService.findUser('email', body.email);
-        if (user) throw new HttpException({ email: 'field.field-taken' }, StatusCodes.BAD_REQUEST);
+        const existedUser = await this.userService.findOne('email', body.email);
+        if (existedUser) throw new HttpException({ email: 'field.field-taken' }, StatusCodes.BAD_REQUEST);
+        const newUser = await this.authService.createOne(body.name, body.email, body.password);
 
-        const newUser = new User();
-        newUser.name = body.name;
-        newUser.email = body.email;
-        newUser.password = await this.authService.encryptPassword(body.password, constant.default.hashingSalt);
-
-        const insertedUser = await this.userService.saveUser(newUser);
-
-        const accessToken = await this.authService.createAccessToken(insertedUser);
+        const accessToken = await this.authService.createAccessToken(newUser);
         return res.cookie(constant.authController.tokenName, accessToken, { maxAge: constant.authController.registerCookieTime }).send({ token: accessToken });
     }
 
@@ -80,7 +74,7 @@ export class AuthController {
     @ApiCreatedResponse({ type: String, description: 'access token' })
     @UsePipes(new JoiValidatorPipe(vLoginDTO))
     async cLogin(@Body() body: LoginDTO, @Res() res: Response) {
-        const user = await this.userService.findUser('email', body.email);
+        const user = await this.userService.findOne('email', body.email);
         if (!user) throw new HttpException({ errorMessage: 'error.invalid-password-username' }, StatusCodes.BAD_REQUEST);
 
         const isCorrectPassword = await this.authService.decryptPassword(body.password, user.password);

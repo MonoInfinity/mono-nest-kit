@@ -26,7 +26,7 @@ describe('UsersController', () => {
                 await Promise.all(
                     Array.from(Array(10).keys()).map(() => {
                         const getUser = fakeUser();
-                        return userService.saveUser(getUser);
+                        return userService.updateOne(getUser);
                     }),
                 );
             });
@@ -34,12 +34,7 @@ describe('UsersController', () => {
             it('Pass (valid queries)', async () => {
                 const reqApi = () => supertest(app.getHttpServer()).get('/api/users/search').query({ name: 'a', currentPage: 1, pageSize: 3, orderBy: 'id', order: 'ASC' });
                 const res = await reqApi();
-                expect(res.body.count).not.toBe(0);
-            });
 
-            it('Pass (invalid page & current page)', async () => {
-                const reqApi = () => supertest(app.getHttpServer()).get('/api/users/search').query({ name: '', currentPage: -1, pageSize: -3 });
-                const res = await reqApi();
                 expect(res.body.count).not.toBe(0);
             });
 

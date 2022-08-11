@@ -37,7 +37,7 @@ describe('AuthController', () => {
             beforeEach(async () => {
                 user = fakeUser();
                 user.isVerified = false;
-                await userService.saveUser(user);
+                await userService.updateOne(user);
             });
 
             it('Pass', async () => {
@@ -68,7 +68,7 @@ describe('AuthController', () => {
             beforeEach(async () => {
                 user = fakeUser();
                 user.isVerified = false;
-                await userService.saveUser(user);
+                await userService.updateOne(user);
 
                 otp = await authService.createAccessToken(user, 5);
             });
@@ -111,7 +111,7 @@ describe('AuthController', () => {
                     password: getUser.password,
                 };
                 getUser.password = await authService.encryptPassword(getUser.password, 2);
-                await userService.saveUser(getUser);
+                await userService.updateOne(getUser);
             });
 
             it('Pass', async () => {
@@ -156,7 +156,7 @@ describe('AuthController', () => {
             });
 
             it('Failed (username taken)', async () => {
-                await userService.saveUser(getUser);
+                await userService.updateOne(getUser);
                 const res = await reqApi(registerData);
                 expect(res.status).toBe(StatusCodes.BAD_REQUEST);
             });
