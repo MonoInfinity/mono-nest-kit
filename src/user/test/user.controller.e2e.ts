@@ -1,18 +1,14 @@
-import { UserController } from './../user.controller';
-import { AuthService } from './../../auth/auth.service';
-import { fakeData, fakeUser } from './../../core/test/helper';
-import { HttpCode, INestApplication } from '@nestjs/common';
-import { UserRepository } from '../../core/repositories';
-import { UserService } from '../../user/user.service';
-import { initTestModule } from '../../core/test/initTest';
-import * as supertest from 'supertest';
-import { ChangePasswordDTO } from '../dto/changePassword.dto';
+import { INestApplication } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
 import { User } from 'src/core/models';
+import * as supertest from 'supertest';
+import { initTestModule } from '../../core/test/initTest';
+import { UserService } from '../../user/user.service';
 import { UpdateUserDTO } from '../dto';
-import { EmailService } from '../../core/providers';
-import { randomUUID } from 'crypto';
-import { RequestVerifyEmailDTO } from 'src/auth/dto';
+import { ChangePasswordDTO } from '../dto/changePassword.dto';
+import { AuthService } from './../../auth/auth.service';
+import { fakeData, fakeUser } from './../../core/test/helper';
+import { UserController } from './../user.controller';
 
 describe('UserController', () => {
     let app: INestApplication;

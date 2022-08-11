@@ -1,16 +1,16 @@
 import { INestApplication } from '@nestjs/common';
+import { randomUUID } from 'crypto';
+import { StatusCodes } from 'http-status-codes';
+import * as supertest from 'supertest';
+import { User } from '../../core/models';
+import { EmailService } from '../../core/providers';
 import { UserRepository } from '../../core/repositories';
-import { UserService } from '../../user/user.service';
+import { fakeUser } from '../../core/test/helper';
 import { initTestModule } from '../../core/test/initTest';
+import { UserService } from '../../user/user.service';
+import { AuthController } from '../auth.controller';
 import { AuthService } from '../auth.service';
 import { LoginDTO, RegisterDTO, RequestVerifyEmailDTO } from '../dto';
-import * as supertest from 'supertest';
-import { fakeUser } from '../../core/test/helper';
-import { User } from '../../core/models';
-import { StatusCodes } from 'http-status-codes';
-import { EmailService } from '../../core/providers';
-import { randomUUID } from 'crypto';
-import { AuthController } from '../auth.controller';
 
 describe('AuthController', () => {
     let app: INestApplication;

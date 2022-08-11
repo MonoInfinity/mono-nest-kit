@@ -1,17 +1,17 @@
 import { Body, Controller, Get, HttpException, Param, Post, Req, Res, UseGuards, UsePipes } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiCreatedResponse } from '@nestjs/swagger';
-import { Request, Response } from 'express';
-import { UserService } from '../user/user.service';
-import { AuthService } from './auth.service';
-import { StatusCodes } from 'http-status-codes';
-import { LoginDTO, vLoginDTO, RegisterDTO, vRegisterDTO, vRequestVerifyEmailDTO, RequestVerifyEmailDTO } from './dto';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
+import { config } from '../core';
 import { constant } from '../core/constant';
+import { JwtToken } from '../core/interface';
 import { User } from '../core/models';
 import { JoiValidatorPipe } from '../core/pipe/validator.pipe';
-import { config } from '../core';
-import { JwtToken } from '../core/interface';
 import { EmailService } from '../core/providers';
+import { UserService } from '../user/user.service';
+import { AuthService } from './auth.service';
+import { LoginDTO, RegisterDTO, RequestVerifyEmailDTO, vLoginDTO, vRegisterDTO, vRequestVerifyEmailDTO } from './dto';
 
 @ApiTags('Authentication')
 @Controller(AuthController.endPoint)

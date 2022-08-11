@@ -1,15 +1,15 @@
 import { INestApplication } from '@nestjs/common';
-import { NextFunction, Request, Response } from 'express';
-import * as cookieParser from 'cookie-parser';
-import { config } from './config';
-import { monoEnum, monoLogger } from 'mono-utils-core';
-import helmet from 'helmet';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as compression from 'compression';
+import * as cookieParser from 'cookie-parser';
+import { NextFunction, Request, Response } from 'express';
+import helmet from 'helmet';
+import * as moment from 'moment';
+import { monoEnum, monoLogger } from 'mono-utils-core';
 import * as morgan from 'morgan';
 import { constant } from '.';
-import * as moment from 'moment';
+import { config } from './config';
 import { winstonLogger } from './providers';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 export function router(app: INestApplication) {
     app.use(cookieParser());

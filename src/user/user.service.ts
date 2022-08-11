@@ -1,11 +1,8 @@
-import { PagingFilter, PagingResult } from './../core/interface/repositories.interface';
-import { FilterUsersDTO } from './dto/filterUsers.dto';
-import { SortOrder } from './../core/interface';
 import { Injectable } from '@nestjs/common';
-import { User, UserRole, UserStatus } from '../core/models';
+import { User } from '../core/models';
 import { UserRepository } from '../core/repositories';
-import { constant } from '../core';
-import { AuthService } from '../auth/auth.service';
+import { PagingResult } from './../core/interface/repositories.interface';
+import { FilterUsersDTO } from './dto/filterUsers.dto';
 
 @Injectable()
 export class UserService {

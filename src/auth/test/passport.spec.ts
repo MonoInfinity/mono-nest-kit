@@ -1,5 +1,4 @@
 import { INestApplication } from '@nestjs/common';
-import { Profile as FaceBookProfile } from 'passport-facebook';
 import { Profile as GoogleProfile } from 'passport-google-oauth20';
 
 //---- Helper
@@ -10,10 +9,10 @@ import { GoogleStrategy } from '../passport/google.strategy';
 //---- Repository
 
 //---- Service
-import { UserService } from '../../user/user.service';
 import { UserRepository } from '../../core/repositories';
-import { initTestModule } from '../../core/test/initTest';
 import { fakeData } from '../../core/test/helper';
+import { initTestModule } from '../../core/test/initTest';
+import { UserService } from '../../user/user.service';
 
 describe('FacebookStrategy', () => {
     let app: INestApplication;
