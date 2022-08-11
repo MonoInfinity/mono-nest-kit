@@ -13,12 +13,14 @@ import { UserRepository } from '../../core/repositories';
 import { fakeData } from '../../core/test/helper';
 import { initTestModule } from '../../core/test/initTest';
 import { UserService } from '../../user/user.service';
+import { AuthService } from '../auth.service';
 
 describe('FacebookStrategy', () => {
     let app: INestApplication;
     let userRepository: UserRepository;
 
     let userService: UserService;
+    let authService: AuthService;
 
     let googleStrategy: GoogleStrategy;
     let resetDb: any;
@@ -29,8 +31,9 @@ describe('FacebookStrategy', () => {
 
         userRepository = module.get<UserRepository>(UserRepository);
         userService = module.get<UserService>(UserService);
+        authService = module.get<AuthService>(AuthService);
 
-        googleStrategy = new GoogleStrategy(userService);
+        googleStrategy = new GoogleStrategy(userService, authService);
     });
 
     describe('GoogleStrategy', () => {

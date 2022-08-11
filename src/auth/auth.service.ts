@@ -9,6 +9,19 @@ import { constant } from '../core';
 export class AuthService {
     constructor(private readonly jwtService: JwtService, private readonly userRepository: UserRepository) {}
 
+    async createOneWithGoogle(name: string, email: string, googleId: string) {
+        const user = new User();
+        user.name = name;
+        user.email = email;
+        user.password = '';
+        user.googleId = googleId;
+        user.isVerified = false;
+        user.createAt = new Date().getTime();
+        user.updateAt = new Date().getTime();
+        user.status = UserStatus.ACTIVE;
+        user.role = UserRole.USER;
+        return await this.userRepository.save(user);
+    }
     async createOne(name: string, email: string, password: string) {
         const user = new User();
         user.name = name;
