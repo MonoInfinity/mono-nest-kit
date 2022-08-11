@@ -4331,10 +4331,10 @@ jest@^27.5.1:
     import-local "^3.0.2"
     jest-cli "^27.5.1"
 
-joi-password@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/joi-password/-/joi-password-3.0.1.tgz#7c979dfebae13fbb4d3d2ab1e3f58590e79643a1"
-  integrity sha512-N0j+23PtwwL88SA0w9T+hg2/FrlPTap9zenI7tOKDF3eFiK3HfnR2tjApilk8ON6PX5Cd0vExIRkhSCBbhGcUg==
+joi-password@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/joi-password/-/joi-password-4.0.0.tgz#2bf772729818b7d626ba8b125d716121d1816008"
+  integrity sha512-wLomwS7O1T2jbUN4pzMH1H4GNNfbywNzRv+H/S4shUxuTzNF0yk+HiXMXODssSJeshzCy6eU+TV+l6p8Zg5zsA==
   dependencies:
     joi "^17.6.0"
 

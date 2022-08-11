@@ -1,7 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { joiPassword } from 'joi-password';
+import { joiPasswordExtendCore, JoiPasswordExtend } from 'joi-password';
 import * as joi from 'joi';
+const joiPassword: JoiPasswordExtend = joi.extend(joiPasswordExtendCore);
 
 export enum UserStatus {
     ACTIVE = 'active',
@@ -38,17 +39,11 @@ export class User {
     @Column({ default: null, unique: true })
     googleId: string;
 
-    @ApiProperty({ description: 'Facebook id' })
-    @Column({ default: null, unique: true })
-    facebookId: string;
+    @ApiProperty({ description: 'Create date' })
+    createAt: string;
 
     @ApiProperty({ description: 'Create date' })
-    @Column({ default: new Date().toISOString().slice(0, 19).replace('T', ' ') })
-    createDate: Date;
-
-    @ApiProperty({ description: 'Update date' })
-    @Column({ default: new Date().toISOString().slice(0, 19).replace('T', ' ') })
-    updateDate: Date;
+    updateAt: string;
 
     @ApiProperty({ description: 'Status' })
     @Column({ default: UserStatus.ACTIVE })
@@ -63,5 +58,5 @@ export const userValidateSchema = {
     name: joi.string().min(5).max(40).trim().lowercase().required(),
     email: joi.string().min(5).max(255).email().trim().lowercase().required(),
     username: joi.string().max(32).min(5).lowercase().alphanum().required(),
-    password: joiPassword.string().min(8).max(32).trim().alphanum().required(),
+    password: joiPassword.string().min(8).max(32).noWhiteSpaces().required(),
 };

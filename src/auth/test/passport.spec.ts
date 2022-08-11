@@ -6,7 +6,6 @@ import { Profile as GoogleProfile } from 'passport-google-oauth20';
 
 //---- Passport Strategy
 import { GoogleStrategy } from '../passport/google.strategy';
-import { FacebookStrategy } from '../passport/facebook.strategy';
 
 //---- Repository
 
@@ -22,8 +21,6 @@ describe('FacebookStrategy', () => {
 
     let userService: UserService;
 
-    let faceBookStrategy: FacebookStrategy;
-
     let googleStrategy: GoogleStrategy;
     let resetDb: any;
     beforeAll(async () => {
@@ -34,61 +31,7 @@ describe('FacebookStrategy', () => {
         userRepository = module.get<UserRepository>(UserRepository);
         userService = module.get<UserService>(UserService);
 
-        faceBookStrategy = new FacebookStrategy(userService);
-
         googleStrategy = new GoogleStrategy(userService);
-    });
-
-    describe('FacebookStrategy', () => {
-        let profile: FaceBookProfile;
-
-        beforeEach(() => {
-            profile = {
-                displayName: 'hellouser',
-                id: fakeData(10),
-                photos: [
-                    {
-                        value: '/url/img.png',
-                    },
-                ],
-                _json: '',
-                _raw: '',
-                birthday: '',
-                provider: '',
-            };
-        });
-
-        it('Pass', async () => {
-            await faceBookStrategy.validate('', '', profile, (_, data) => expect(data).toBeDefined());
-
-            const user = await userRepository.findOneByField('facebookId', profile.id);
-            expect(user.facebookId).toBeDefined();
-            expect(user.facebookId).toBe(profile.id);
-        });
-
-        it('Pass (user validate 2 times but only exist one in database)', async () => {
-            await faceBookStrategy.validate('', '', profile, (_, data) => expect(data).toBeDefined());
-            await faceBookStrategy.validate('', '', profile, (_, data) => expect(data).toBeDefined());
-
-            const user = await userRepository.findManyByField('facebookId', profile.id);
-            expect(user.length).toBe(1);
-            expect(user[0].facebookId).toBe(profile.id);
-        });
-
-        it('Failed (missing some properties in profile)', async () => {
-            delete profile._json;
-            delete profile.displayName;
-            delete profile.photos;
-            delete profile.id;
-
-            await faceBookStrategy.validate('', '', profile, (error, data) => {
-                expect(data).toBeNull();
-                expect(error).toBeDefined();
-            });
-
-            const user = await userRepository.findOneByField('facebookId', profile.id);
-            expect(user).toBeUndefined();
-        });
     });
 
     describe('GoogleStrategy', () => {

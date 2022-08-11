@@ -109,17 +109,4 @@ export class AuthController {
         const accessToken = await this.authService.createAccessToken(req.user as User);
         return res.cookie(constant.authController.tokenName, accessToken, { maxAge: constant.authController.googleUserCookieTime }).redirect(config.GOOGLE_CLIENT_REDIRECT_URL);
     }
-
-    @Get('/facebook')
-    @UseGuards(AuthGuard('facebook'))
-    async cFacebookAuth() {
-        //
-    }
-
-    @Get('/facebook/callback')
-    @UseGuards(AuthGuard('facebook'))
-    async cFacebookAuthRedirect(@Req() req: Request, @Res() res: Response) {
-        const accessToken = await this.authService.createAccessToken(req.user as User);
-        return res.cookie(constant.authController.tokenName, accessToken, { maxAge: constant.authController.facebookUserCookieTime }).redirect(config.FACEBOOK_CLIENT_REDIRECT_URL);
-    }
 }

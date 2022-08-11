@@ -34,11 +34,6 @@ describe('AuthController', () => {
                 const res = await authController.cGoogleAuth();
                 expect(res).toBeUndefined();
             });
-
-            it('facebookAuth', async () => {
-                const res = await authController.cFacebookAuth();
-                expect(res).toBeUndefined();
-            });
         });
 
         describe('googleAuthRedirect | facebookAuthRedirect | githubAuthRedirect', () => {
@@ -58,12 +53,6 @@ describe('AuthController', () => {
                 const output = await authController.cGoogleAuthRedirect(req, res);
 
                 expect(output).toBe(config.GOOGLE_CLIENT_REDIRECT_URL);
-            });
-
-            it('facebookAuthRedirect', async () => {
-                const output = await authController.cFacebookAuthRedirect(req, res);
-
-                expect(output).toBe(config.FACEBOOK_CLIENT_REDIRECT_URL);
             });
         });
     });

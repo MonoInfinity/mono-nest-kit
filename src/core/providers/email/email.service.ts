@@ -23,7 +23,10 @@ export class EmailService {
 
         return this.mailService
             .send(mail)
-            .then(() => true)
+            .then(() => {
+                monoLogger.log(constant.NS.MAIL, `Send mail to ${receiver} successfully`);
+                return true;
+            })
             .catch((error) => {
                 monoLogger.log(constant.NS.APP_ERROR, error.response.body);
                 return false;

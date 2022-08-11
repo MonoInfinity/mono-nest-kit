@@ -193,6 +193,7 @@ describe('UserController', () => {
 
         it('POST /verify-email', async () => {
             const res = await sendApi({ email: getUser.email }, token);
+
             expect(res).toBeDefined();
             expect(res.status).toBe(StatusCodes.CREATED);
         });

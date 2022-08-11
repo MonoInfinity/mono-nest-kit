@@ -19,5 +19,6 @@ export const constant = Object.freeze({
         APP_ERROR: 'app-error',
         APP_WARN: 'app-warn',
         HTTP: 'http-app',
+        MAIL: 'http-mail',
     },
 });
