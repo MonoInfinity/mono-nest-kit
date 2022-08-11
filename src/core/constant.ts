@@ -1,4 +1,5 @@
 export const constant = Object.freeze({
+    authHeader: 'authorization',
     authController: {
         loginCookieTime: 1000 * 60 * 60 * 24 * 30,
         registerCookieTime: 1000 * 60 * 60 * 24 * 30,

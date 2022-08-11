@@ -6,6 +6,8 @@ import { Request } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { UserService } from '../user/user.service';
 import { JwtToken } from '../core/interface';
+import { constant } from '../core';
+import * as _ from 'lodash';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -14,9 +16,8 @@ export class AuthGuard implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const req: Request = context.switchToHttp().getRequest();
         const roles = this.reflector.get<UserRole[]>('roles', context.getHandler()) || [];
-
-        const authorization = req.headers['authorization'] || '';
-        const token = this.getTokenFromHeader(authorization);
+        const authorization = _.get(req.headers, `${constant.authHeader}`, '');
+        const token = _.get((authorization as string).split(' '), `[1]`, '');
 
         const { data, error } = await this.authService.verifyToken<JwtToken>(token);
         if (error) {
@@ -37,10 +38,5 @@ export class AuthGuard implements CanActivate {
         req.user = user;
 
         return true;
-    }
-
-    getTokenFromHeader(authorization: string): string {
-        const accessToken = authorization.split(' ')[1];
-        return accessToken;
     }
 }
