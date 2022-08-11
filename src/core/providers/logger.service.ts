@@ -1,6 +1,7 @@
 import { LoggerService } from '@nestjs/common';
 import { monoLogger } from 'mono-utils-core';
 import { constant } from '../constant';
+import * as winston from 'winston';
 
 export class CustomLoggerService implements LoggerService {
     /**
@@ -24,3 +25,9 @@ export class CustomLoggerService implements LoggerService {
         monoLogger.log(constant.NS.APP_WARN, optionalParams);
     }
 }
+export const winstonLogger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    defaultMeta: { service: 'user-service' },
+    transports: [new winston.transports.File({ filename: './log/error.log', level: 'error' }), new winston.transports.File({ filename: './log/info.log', level: 'info' })],
+});
