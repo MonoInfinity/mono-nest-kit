@@ -10,10 +10,12 @@ import { ChangePasswordDTO, vChangePasswordDTO, UpdateUserDTO, vUpdateUserDTO, v
 import { constant } from '../core';
 import { QueryJoiValidatorPipe } from '../core/pipe/queryValidator.pipe';
 
-@ApiTags('user')
+@ApiTags('User')
 @ApiBearerAuth()
-@Controller('user')
+@Controller(UserController.endPoint)
 export class UserController {
+    static endPoint = '/api/users';
+
     constructor(private readonly userService: UserService, private readonly authService: AuthService) {}
 
     @Get('/me')
@@ -58,12 +60,10 @@ export class UserController {
         return res.send();
     }
 
-    @Get('/search')
+    @Get('/')
     @UsePipes(new QueryJoiValidatorPipe(vFilterUsersDto))
     async filterUsers(@Query() queries: FilterUsersDTO, @Res() res: Response) {
-        const { name, page, pageSize, orderBy, order } = queries;
-
-        const result = await this.userService.filterUsers(name, page, pageSize, orderBy, order);
+        const result = await this.userService.findMany(queries);
 
         return res.send(result);
     }

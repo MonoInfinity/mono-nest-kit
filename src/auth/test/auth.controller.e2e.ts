@@ -10,6 +10,7 @@ import { User } from '../../core/models';
 import { StatusCodes } from 'http-status-codes';
 import { EmailService } from '../../core/providers';
 import { randomUUID } from 'crypto';
+import { AuthController } from '../auth.controller';
 
 describe('AuthController', () => {
     let app: INestApplication;
@@ -32,7 +33,7 @@ describe('AuthController', () => {
 
     describe('Post User', () => {
         describe('POST /verify-email', () => {
-            const reqApi = (input: RequestVerifyEmailDTO) => supertest(app.getHttpServer()).post('/api/auth/verify-email').send(input);
+            const reqApi = (input: RequestVerifyEmailDTO) => supertest(app.getHttpServer()).post(`${AuthController.endPoint}/verify-email`).send(input);
             let user: User;
             beforeEach(async () => {
                 user = fakeUser();
@@ -62,7 +63,7 @@ describe('AuthController', () => {
         });
 
         describe('GET /verify-email/:otp', () => {
-            const reqApi = (otp: string) => supertest(app.getHttpServer()).get(`/api/auth/verify-email/${otp}`).send();
+            const reqApi = (otp: string) => supertest(app.getHttpServer()).get(`${AuthController.endPoint}/verify-email/${otp}`).send();
             let user: User;
             let otp: string;
             beforeEach(async () => {
@@ -102,7 +103,7 @@ describe('AuthController', () => {
     describe('Common Authentication', () => {
         describe('POST /login', () => {
             let loginUserData: LoginDTO;
-            const reqApi = (input: LoginDTO) => supertest(app.getHttpServer()).post('/api/auth/login').send(input);
+            const reqApi = (input: LoginDTO) => supertest(app.getHttpServer()).post(`${AuthController.endPoint}/login`).send(input);
 
             beforeEach(async () => {
                 const getUser = fakeUser();
@@ -136,7 +137,7 @@ describe('AuthController', () => {
 
         describe('POST /register', () => {
             let registerData: RegisterDTO;
-            const reqApi = (input: RegisterDTO) => supertest(app.getHttpServer()).post('/api/auth/register').send(input);
+            const reqApi = (input: RegisterDTO) => supertest(app.getHttpServer()).post(`${AuthController.endPoint}/register`).send(input);
             let getUser: User;
             beforeEach(async () => {
                 getUser = fakeUser();
@@ -163,7 +164,7 @@ describe('AuthController', () => {
         });
 
         describe('POST /logout', () => {
-            const reqApi = () => supertest(app.getHttpServer()).post(`/api/auth/logout`).send();
+            const reqApi = () => supertest(app.getHttpServer()).post(`${AuthController.endPoint}/logout`).send();
 
             it('Pass', async () => {
                 const res = await reqApi();

@@ -7,7 +7,13 @@ export enum SortOrder {
     DESC = 'DESC',
 }
 const { currentPage, pageSize, orderBy } = constant.default;
-export class CommonFilter {
+
+export interface PagingResult<T> {
+    data: Array<T>;
+    count: number;
+}
+
+export class PagingFilter {
     @ApiProperty({ description: 'Current Page', example: 0, nullable: true })
     page: number;
 
@@ -21,7 +27,7 @@ export class CommonFilter {
     order: SortOrder;
 }
 
-export const vCommonFilter = {
+export const vPagingFilter = {
     page: joi.number().failover(currentPage).min(0).failover(0).required(),
     pageSize: joi.number().failover(pageSize).min(0).failover(12).required(),
     orderBy: joi.string().allow('').failover(orderBy).required(),

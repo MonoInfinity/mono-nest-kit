@@ -13,9 +13,11 @@ import { config } from '../core';
 import { JwtToken } from '../core/interface';
 import { EmailService } from '../core/providers';
 
-@ApiTags('auth')
-@Controller('auth')
+@ApiTags('Authentication')
+@Controller(AuthController.endPoint)
 export class AuthController {
+    static endPoint = '/api/auth';
+
     constructor(private readonly authService: AuthService, private readonly userService: UserService, private readonly emailService: EmailService) {}
 
     @Post('/verify-email')

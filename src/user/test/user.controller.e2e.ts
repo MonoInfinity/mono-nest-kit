@@ -1,3 +1,4 @@
+import { UserController } from './../user.controller';
 import { AuthService } from './../../auth/auth.service';
 import { fakeData, fakeUser } from './../../core/test/helper';
 import { HttpCode, INestApplication } from '@nestjs/common';
@@ -17,16 +18,15 @@ describe('UserController', () => {
     let app: INestApplication;
 
     let userService: UserService;
-    let userRepository: UserRepository;
+
     let authService: AuthService;
-    let emailService: EmailService;
+
     let resetDb: () => Promise<void>;
     beforeAll(async () => {
         const { getApp, module, resetDatabase } = await initTestModule();
         app = getApp;
         resetDb = resetDatabase;
-        userRepository = module.get<UserRepository>(UserRepository);
-        emailService = module.get<EmailService>(EmailService);
+
         authService = module.get<AuthService>(AuthService);
 
         userService = module.get<UserService>(UserService);
@@ -38,7 +38,7 @@ describe('UserController', () => {
             let token;
             const reqApi = (input: UpdateUserDTO, token: string) =>
                 supertest(app.getHttpServer())
-                    .put('/api/user')
+                    .put(UserController.endPoint)
                     .set({ authorization: `Bearer ${token}` })
                     .send(input);
             beforeEach(async () => {
@@ -60,7 +60,7 @@ describe('UserController', () => {
             let changePasswordData: ChangePasswordDTO;
             const reqApi = (input: ChangePasswordDTO, token: string) =>
                 supertest(app.getHttpServer())
-                    .put('/api/user/password')
+                    .put(`${UserController.endPoint}/password`)
                     .set({ authorization: `Bearer ${token}` })
                     .send(input);
             let token: string;
@@ -99,13 +99,13 @@ describe('UserController', () => {
             let token;
             const reqApi = (input: UpdateUserDTO, token: string) =>
                 supertest(app.getHttpServer())
-                    .put('/api/user')
+                    .put(UserController.endPoint)
                     .set({ authorization: `Bearer ${token}` })
                     .send(input);
 
             const userReqApi = (token: string) =>
                 supertest(app.getHttpServer())
-                    .get('/api/user/me')
+                    .get(`${UserController.endPoint}/me`)
                     .set({ authorization: `Bearer ${token}` });
 
             beforeEach(async () => {
@@ -132,7 +132,7 @@ describe('UserController', () => {
             let getUser: User;
             const reqApi = (token: string) =>
                 supertest(app.getHttpServer())
-                    .get('/api/user/me')
+                    .get(`${UserController.endPoint}/me`)
                     .set({ authorization: `Bearer ${token}` });
             let token;
             beforeEach(async () => {
@@ -155,7 +155,7 @@ describe('UserController', () => {
 
         describe('Get /user/:userId', () => {
             let getUser: User;
-            const reqApi = (userId: string) => supertest(app.getHttpServer()).get(`/api/user/${userId}`);
+            const reqApi = (userId: string) => supertest(app.getHttpServer()).get(`${UserController.endPoint}/${userId}`);
             beforeEach(async () => {
                 getUser = fakeUser();
                 await userService.updateOne(getUser);
@@ -169,39 +169,29 @@ describe('UserController', () => {
         });
     });
 
-    describe('API /verify-email', () => {
-        let getUser: User;
-        let token;
-        let otp;
-        const sendApi = (input: RequestVerifyEmailDTO, token: string) =>
-            supertest(app.getHttpServer())
-                .post('/api/auth/verify-email')
-                .set({ authorization: `Bearer ${token}` })
-                .send(input);
+    describe('Get Users', () => {
+        describe('GET /search', () => {
+            beforeEach(async () => {
+                await Promise.all(
+                    Array.from(Array(10).keys()).map(() => {
+                        const getUser = fakeUser();
+                        return userService.updateOne(getUser);
+                    }),
+                );
+            });
 
-        const verifyApi = (token, otp) =>
-            supertest(app.getHttpServer())
-                .get(`/api/auth/verify-email/${otp}`)
-                .set({ authorization: `Bearer ${token}` });
+            it('Pass (valid queries)', async () => {
+                const reqApi = () => supertest(app.getHttpServer()).get(UserController.endPoint).query({ name: 'a', currentPage: 1, pageSize: 3, orderBy: 'id', order: 'ASC' });
+                const res = await reqApi();
 
-        beforeEach(async () => {
-            getUser = fakeUser();
-            await userService.updateOne(getUser);
-            token = await authService.createAccessToken(getUser);
-            otp = await authService.createAccessToken(getUser, 5);
-        });
+                expect(res.body.count).not.toBe(0);
+            });
 
-        it('POST /verify-email', async () => {
-            const res = await sendApi({ email: getUser.email }, token);
-
-            expect(res).toBeDefined();
-            expect(res.status).toBe(StatusCodes.CREATED);
-        });
-
-        it('GET /verify-email/:otp', async () => {
-            const res = await verifyApi(token, otp);
-            expect(res).toBeDefined();
-            expect(res.status).toBe(StatusCodes.OK);
+            it('Pass (invalid orderBy)', async () => {
+                const reqApi = () => supertest(app.getHttpServer()).get(UserController.endPoint).query({ name: '', orderBy: 'aaaa' });
+                const res = await reqApi();
+                expect(res.body.count).toBe(0);
+            });
         });
     });
 

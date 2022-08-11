@@ -5,10 +5,9 @@ import { router } from '../router';
 import { fakeUser } from './helper';
 
 const resetDatabase = async (module: TestingModule) => {
-    const userRepository = module.get<UserRepository>(UserRepository);
-
-    await userRepository.createQueryBuilder().delete().execute();
-    await userRepository.clear();
+    //     const userRepository = module.get<UserRepository>(UserRepository);
+    //     await userRepository.createQueryBuilder().delete().execute();
+    //     await userRepository.clear();
 };
 
 export const initTestModule = async () => {
