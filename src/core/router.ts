@@ -41,14 +41,25 @@ export function router(app: INestApplication) {
             const reqDate = tokens['date'](req, res);
 
             const content = `${moment(reqDate).format('YYYY-MM-DD HH:mm:ss')} ${reqIp} ${reqMethod} ${reqUrl} ${resStatus} - ${resTime} ms`;
-            winstonLogger.info({
-                resStatus,
-                resTime,
-                reqMethod,
-                reqUrl,
-                reqIp,
-                reqDate,
-            });
+            if(resStatus >= 500) {
+                winstonLogger.error({
+                    resStatus,
+                    resTime,
+                    reqMethod,
+                    reqUrl,
+                    reqIp,
+                    reqDate,
+                });
+            } else {
+                winstonLogger.info({
+                    resStatus,
+                    resTime,
+                    reqMethod,
+                    reqUrl,
+                    reqIp,
+                    reqDate,
+                });
+            }
             monoLogger.log(constant.NS.HTTP, content);
         }),
     );
