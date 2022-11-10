@@ -39,10 +39,7 @@ export class EmailService {
             'VERIFY EMAIL',
             `
                                                 <div>
-                                                    <h2>Hello, ${receiver}</h2>
-                                                    <p>We are from Mono Infinity Team</p>
-                                                    <p>Please click to this link to verify your email:</p>
-                                                    <a href="${config.SENDGRID_URL}/user/verify-email/${otp}"></a>
+                                            
                                                 </div>
         `,
         );

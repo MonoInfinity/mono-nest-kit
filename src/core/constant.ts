@@ -8,7 +8,7 @@ export const constant = Object.freeze({
         tokenName: 'access-token',
     },
     default: {
-        orderBy: 'createDate',
+        orderBy: 'createAt',
         currentPage: 0,
         pageSize: 12,
         pageSizeMd: 24,

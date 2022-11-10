@@ -10,20 +10,27 @@ export class RepositoryService<T> extends Repository<T> {
         return value.map((item) => ` OR ${tableName}.${field} LIKE '${item}'`).join(' ');
     }
 
-    protected async paging(query: SelectQueryBuilder<T>, pagingProps: PagingFilter): Promise<PagingResult<T>> {
+    protected async paging(
+        query: SelectQueryBuilder<T>,
+        pagingProps: Record<keyof PagingFilter | string, any>,
+    ): Promise<PagingResult<T>> {
         const { tableName } = this.metadata;
+        // if (!pagingProps.isShowInactive) {
+        //     query = query.andWhere(`${tableName}.status <> 'inactive'`);
+        // }
 
         try {
             const data = await query
-                .orderBy(`${tableName}.${pagingProps.orderBy}`, pagingProps.order)
                 .skip(pagingProps.page * pagingProps.pageSize)
                 .take(pagingProps.pageSize)
+                // .orderBy(`${tableName}.${pagingProps.orderBy}`, pagingProps.order)
                 .getMany();
-
+            console.log(data);
             const count = await query.getCount();
 
             return { data, count };
         } catch (err) {
+            console.log(err);
             return { data: [], count: 0 };
         }
     }
